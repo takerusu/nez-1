@@ -17,6 +17,7 @@ public abstract class Context implements Source {
 			this.stack[i] = new StackEntry();
 		}
 		this.stack[0].jump = new Iexit(null);
+		this.stack[0].failjump = new Iexit(null);
 		this.StackTop = 0;
 	}
 
