@@ -34,7 +34,15 @@ public class IRBuilder {
 					}
 					if(inst instanceof JumpInstruction) {
 						JumpInstruction jinst = (JumpInstruction) inst;
-						jinst.jump = jinst.jumpBB.get(0);
+						BasicBlock jbb = jinst.jumpBB;
+						if(jbb.size() != 0) {
+							jinst.jump = jinst.jumpBB.get(0);
+						} else {
+							while(jbb.size() == 0) {
+								jbb = jbb.getSingleSuccessor();
+							}
+							jinst.jump = jbb.get(0);
+						}
 					}
 					prev = inst;
 				}
@@ -74,7 +82,17 @@ public class IRBuilder {
 
 	public void setInsertPoint(BasicBlock bb) {
 		this.func.append(bb);
-		bb.setName("B" + this.func.size());
+		bb.setName("bb" + this.func.size());
+		if(this.curBB != null) {
+			if(bb.size() != 0) {
+				DebugVMInstruction last = this.curBB.get(this.curBB.size() - 1);
+				if(!(last.op.equals(Opcode.Ijump) || last.op.equals(Opcode.Icall))) {
+					this.curBB.setSingleSuccessor(bb);
+				}
+			} else {
+				this.curBB.setSingleSuccessor(bb);
+			}
+		}
 		this.curBB = bb;
 	}
 
