@@ -28,8 +28,9 @@ public class IRBuilder {
 		this.func = func;
 	}
 
-	public void setCurrentBBtoFunc(BasicBlock bb) {
+	public void setInsertPoint(BasicBlock bb) {
 		this.func.append(bb);
+		bb.setName("B" + this.func.size());
 		this.curBB = bb;
 	}
 

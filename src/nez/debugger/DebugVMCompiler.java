@@ -42,8 +42,13 @@ public class DebugVMCompiler extends NezEncoder {
 
 	public Instruction encodeProduction(Production p) {
 		this.builder.setFunction(new Function(p.getLocalName()));
-		this.builder.setCurrentBBtoFunc(new BasicBlock());
-		return this.encodeExpression(p.getExpression(), null, null);
+		this.builder.setInsertPoint(new BasicBlock());
+		BasicBlock fbb = new BasicBlock();
+		this.builder.pushFailureJumpPoint(fbb);
+		this.encodeExpression(p.getExpression(), null, null);
+		this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
+		this.builder.createIret(p);
+		return null;
 	}
 
 	@Override
