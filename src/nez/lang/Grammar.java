@@ -8,6 +8,11 @@ import nez.SourceContext;
 import nez.ast.CommonTree;
 import nez.ast.CommonTreeTransducer;
 import nez.ast.TreeTransducer;
+import nez.debugger.DebugInputManager;
+import nez.debugger.DebugSourceContext;
+import nez.debugger.DebugVMCompiler;
+import nez.debugger.DebugVMInstruction;
+import nez.debugger.NezDebugger;
 import nez.main.Command;
 import nez.main.NezProfier;
 import nez.main.Verbose;
@@ -21,7 +26,6 @@ import nez.vm.MemoPoint;
 import nez.vm.MemoTable;
 import nez.vm.NezCode;
 import nez.vm.NezCompiler;
-import nez.vm.NezDebugger;
 import nez.vm.NezCompiler1;
 import nez.vm.NezCompiler2;
 
@@ -160,14 +164,15 @@ public class Grammar {
 		return matched;
 	}
 
-	public final boolean debug(SourceContext s) {
+	public final boolean debug(DebugSourceContext s) {
 		boolean matched;
-		Instruction pc;
-		s.initJumpStack(getMemoTable(s));
-		NezCompiler c = new NezCompiler1(this.option);
+		DebugVMInstruction pc;
+		DebugVMCompiler c = new DebugVMCompiler(this.option);
 		pc = c.compile(this).getStartPoint();
-		NezDebugger debugger = new NezDebugger(this, pc, s);
-		matched = debugger.exec();
+		NezDebugger debugger = new NezDebugger();
+		matched = debugger.exec(pc, s);
+//		NezDebugger debugger = new NezDebugger(this, pc, s);
+//		matched = debugger.exec();
 //		if(matched) {
 //			s.newTopLevelNode();
 //		}
