@@ -13,6 +13,7 @@ public class LCndb extends Command {
 	public void exec(CommandContext config) {
 		// config.setNezOption(NezOption.DebugOption);
 		Command.displayVersion();
+		config.getNezOption().setOption("asis", true);
 		Grammar peg = config.getGrammar();
 		DebugInputManager manager = new DebugInputManager(config.inputFileLists);
 		manager.exec(peg);
