@@ -5,7 +5,6 @@ import nez.lang.ByteChar;
 import nez.lang.ByteMap;
 import nez.lang.Expression;
 import nez.lang.NonTerminal;
-import nez.lang.Production;
 
 public class IRBuilder {
 	private BasicBlock curBB;
@@ -58,11 +57,7 @@ public class IRBuilder {
 		this.fLabel = new FailureBB(bb, this.fLabel);
 	}
 
-	public void popFailureJumpPoint(Production r) {
-		this.fLabel = this.fLabel.prev;
-	}
-
-	public BasicBlock popFailureJumpPoint(Expression e) {
+	public BasicBlock popFailureJumpPoint() {
 		BasicBlock fbb = this.fLabel.fbb;
 		this.fLabel = this.fLabel.prev;
 		return fbb;
