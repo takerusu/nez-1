@@ -23,7 +23,7 @@ public class Module {
 	}
 
 	public String stringfy(StringBuilder sb) {
-		for (int i = 0; i < size(); i++) {
+		for(int i = 0; i < size(); i++) {
 			this.get(i).stringfy(sb);
 		}
 		return sb.toString();

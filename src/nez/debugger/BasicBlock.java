@@ -41,7 +41,7 @@ public class BasicBlock {
 	}
 
 	public void stringfy(StringBuilder sb) {
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			this.get(i).stringfy(sb);
 			sb.append("\n");
 		}

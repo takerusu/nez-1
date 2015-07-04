@@ -34,11 +34,11 @@ public class Function {
 
 	public List<Instruction> serchInst(Expression e) {
 		List<Instruction> ilist = new ArrayList<Instruction>();
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			BasicBlock bb = this.get(i);
-			for (int j = 0; j < bb.size(); j++) {
+			for(int j = 0; j < bb.size(); j++) {
 				Instruction inst = bb.get(j);
-				if (inst.expr.equals(e)) {
+				if(inst.expr.equals(e)) {
 					ilist.add(inst);
 				}
 			}
@@ -52,7 +52,7 @@ public class Function {
 
 	public int instSize() {
 		int size = 0;
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			size += this.get(i).size();
 		}
 		return size;
@@ -64,7 +64,7 @@ public class Function {
 
 	public void stringfy(StringBuilder sb) {
 		sb.append(this.funcName + ":\n");
-		for (int i = 0; i < this.size(); i++) {
+		for(int i = 0; i < this.size(); i++) {
 			sb.append("bb" + i + " {\n");
 			this.get(i).stringfy(sb);
 			sb.append("}\n");
