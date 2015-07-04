@@ -54,7 +54,7 @@ public class DebugVMCompiler extends NezEncoder {
 		this.builder.setInsertPoint(new BasicBlock());
 		BasicBlock fbb = new BasicBlock();
 		this.builder.pushFailureJumpPoint(fbb);
-		this.encodeExpression(p.getExpression(), null, null);
+		p.encode(this, null, null);
 		this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
 		this.builder.createIret(p);
 		return null;
@@ -74,18 +74,21 @@ public class DebugVMCompiler extends NezEncoder {
 	@Override
 	public Instruction encodeAnyChar(AnyChar p, Instruction next, Instruction failjump) {
 		this.builder.createIany(p, this.builder.jumpFailureJump());
+		this.builder.setInsertPoint(new BasicBlock());
 		return null;
 	}
 
 	@Override
 	public Instruction encodeByteChar(ByteChar p, Instruction next, Instruction failjump) {
 		this.builder.createIchar(p, this.builder.jumpFailureJump());
+		this.builder.setInsertPoint(new BasicBlock());
 		return null;
 	}
 
 	@Override
 	public Instruction encodeByteMap(ByteMap p, Instruction next, Instruction failjump) {
 		this.builder.createIcharclass(p, this.builder.jumpFailureJump());
+		this.builder.setInsertPoint(new BasicBlock());
 		return null;
 	}
 
@@ -97,7 +100,18 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeOption(Option p, Instruction next) {
-		// TODO Auto-generated method stub
+		BasicBlock fbb = new BasicBlock();
+		BasicBlock mergebb = new BasicBlock();
+		this.builder.pushFailureJumpPoint(fbb);
+		this.builder.createIpush(p);
+		p.get(0).encode(this, next, null);
+		this.builder.createIpop(p);
+		this.builder.createIjump(p, mergebb);
+		this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
+		this.builder.createIsucc(p);
+		this.builder.createIpeek(p);
+		this.builder.createIpop(p);
+		this.builder.setInsertPoint(mergebb);
 		return null;
 	}
 
