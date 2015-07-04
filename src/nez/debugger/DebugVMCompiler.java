@@ -167,7 +167,18 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeNot(Not p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		BasicBlock fbb = new BasicBlock();
+		this.builder.pushFailureJumpPoint(fbb);
+		this.builder.createIpush(p);
+		p.get(0).encode(this, next, failjump);
+		this.builder.createIfail(p);
+		this.builder.createIpeek(p);
+		this.builder.createIpop(p);
+		this.builder.createIjump(p, this.builder.jumpPrevFailureJump());
+		this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
+		this.builder.createIsucc(p);
+		this.builder.createIpeek(p);
+		this.builder.createIpop(p);
 		return null;
 	}
 
