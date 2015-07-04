@@ -73,7 +73,7 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeAnyChar(AnyChar p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		this.builder.createIany(p, this.builder.jumpFailureJump());
 		return null;
 	}
 
@@ -85,7 +85,7 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeByteMap(ByteMap p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		this.builder.createIcharclass(p, this.builder.jumpFailureJump());
 		return null;
 	}
 
