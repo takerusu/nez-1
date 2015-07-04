@@ -15,6 +15,50 @@ public class IRBuilder {
 		this.module = m;
 	}
 
+	public Module buildInstructionSequence() {
+		int codeIndex = 0;
+		for(int i = 0; i < this.module.size(); i++) {
+			Function func = this.module.get(i);
+			for(int j = 0; j < func.size(); j++) {
+				BasicBlock bb = func.get(j);
+				bb.codePoint = codeIndex;
+				codeIndex += bb.size();
+			}
+		}
+		for(Function f : this.module.funcList) {
+			DebugVMInstruction prev = null;
+			for(BasicBlock bb : f.bbList) {
+				for(DebugVMInstruction inst : bb.insts) {
+					if(prev != null) {
+						prev.next = inst;
+					}
+					if(inst instanceof JumpInstruction) {
+						JumpInstruction jinst = (JumpInstruction) inst;
+						jinst.jump = jinst.jumpBB.get(0);
+					}
+					prev = inst;
+				}
+			}
+		}
+		this.dumpLastestCode();
+		return this.module;
+	}
+
+	private void dumpLastestCode() {
+		int codeIndex = 0;
+		for(int i = 0; i < this.module.size(); i++) {
+			Function func = this.module.get(i);
+			for(int j = 0; j < func.size(); j++) {
+				BasicBlock bb = func.get(j);
+				for(int k = 0; k < bb.size(); k++) {
+					DebugVMInstruction inst = bb.get(k);
+					System.out.println("[" + codeIndex + "] " + inst.toString());
+					codeIndex++;
+				}
+			}
+		}
+	}
+
 	public Module getModule() {
 		return this.module;
 	}
