@@ -135,6 +135,7 @@ public abstract class Context implements Source {
 			this.consume(1);
 			return inst.next;
 		}
+		this.result = false;
 		return inst.jump;
 	}
 
@@ -144,6 +145,7 @@ public abstract class Context implements Source {
 			this.consume(1);
 			return inst.next;
 		}
+		this.result = false;
 		return inst.jump;
 	}
 
@@ -152,6 +154,7 @@ public abstract class Context implements Source {
 			this.consume(1);
 			return inst.next;
 		}
+		this.result = false;
 		return inst.jump;
 	}
 }
