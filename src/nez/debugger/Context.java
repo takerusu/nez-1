@@ -13,6 +13,9 @@ public abstract class Context implements Source {
 	public final void initContext() {
 		this.result = true;
 		this.stack = new StackEntry[StackSize];
+		for(int i = 0; i < this.stack.length; i++) {
+			this.stack[i] = new StackEntry();
+		}
 		this.stack[0].jump = new Iexit(null);
 		this.StackTop = 0;
 	}
@@ -35,10 +38,31 @@ public abstract class Context implements Source {
 	}
 
 	public final void rollback(long pos) {
-		if (this.longest_pos < this.pos) {
+		if(this.longest_pos < this.pos) {
 			this.longest_pos = this.pos;
 		}
 		this.pos = pos;
+	}
+
+	public final StackEntry newStackEntry() {
+		this.StackTop++;
+		if(this.StackTop == this.stack.length) {
+			StackEntry[] newStack = new StackEntry[this.stack.length * 2];
+			System.arraycopy(this.stack, 0, newStack, 0, stack.length);
+			for(int i = this.stack.length; i < newStack.length; i++) {
+				newStack[i] = new StackEntry();
+			}
+			this.stack = newStack;
+		}
+		return this.stack[this.StackTop];
+	}
+
+	public final StackEntry popStack() {
+		return this.stack[this.StackTop--];
+	}
+
+	public final StackEntry peekStack() {
+		return this.stack[this.StackTop];
 	}
 
 	public final String getSyntaxErrorMessage() {
@@ -54,55 +78,85 @@ public abstract class Context implements Source {
 	}
 
 	public final Instruction opIcall(Icall inst) {
-		return null;
+		StackEntry top = this.newStackEntry();
+		top.jump = inst.jump;
+		top.failjump = inst.failjump;
+		return inst.next;
 	}
 
 	public final Instruction opIret(Iret inst) {
-		return null;
+		StackEntry top = this.popStack();
+		if(this.result) {
+			return top.jump;
+		}
+		return top.failjump;
 	}
 
 	public final Instruction opIjump(Ijump inst) {
-		return null;
+		return inst.jump;
 	}
 
 	public final Instruction opIiffail(Iiffail inst) {
-		return null;
+		if(this.result) {
+			return inst.next;
+		}
+		return inst.jump;
 	}
 
 	public final Instruction opIpush(Ipush inst) {
-		return null;
+		StackEntry top = this.newStackEntry();
+		top.pos = this.pos;
+		return inst.next;
 	}
 
 	public final Instruction opIpop(Ipop inst) {
-		return null;
+		this.popStack();
+		return inst.next;
 	}
 
 	public final Instruction opIpeek(Ipeek inst) {
-		return null;
+		this.pos = this.peekStack().pos;
+		return inst.next;
 	}
 
 	public final Instruction opIsucc(Isucc inst) {
-		return null;
+		this.result = true;
+		return inst.next;
 	}
 
 	public final Instruction opIfail(Ifail inst) {
-		return null;
+		this.result = false;
+		return inst.next;
 	}
 
 	public final Instruction opIchar(Ichar inst) {
-		return null;
+		if(this.byteAt(this.pos) == inst.byteChar) {
+			this.consume(1);
+			return inst.next;
+		}
+		return inst.jump;
 	}
 
 	public final Instruction opIcharclass(Icharclass inst) {
-		return null;
+		int byteChar = this.byteAt(this.pos);
+		if(inst.byteMap[byteChar]) {
+			this.consume(1);
+			return inst.next;
+		}
+		return inst.jump;
 	}
 
 	public final Instruction opIany(Iany inst) {
-		return null;
+		if(hasUnconsumed()) {
+			this.consume(1);
+			return inst.next;
+		}
+		return inst.jump;
 	}
 }
 
 class StackEntry {
 	Instruction jump;
+	Instruction failjump;
 	long pos;
 }

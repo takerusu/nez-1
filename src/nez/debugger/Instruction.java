@@ -53,18 +53,34 @@ class Iexit extends Instruction {
 	}
 }
 
-class Icall extends Instruction {
-	NonTerminal ne;
-	int jump;
+abstract class JumpInstruction extends Instruction {
+	BasicBlock jumpBB;
+	Instruction jump;
 
-	public Icall(NonTerminal e) {
+	public JumpInstruction(Expression e, BasicBlock jump) {
 		super(e);
+		this.jumpBB = jump;
+	}
+
+	public BasicBlock getJumpBB() {
+		return this.jumpBB;
+	}
+}
+
+class Icall extends JumpInstruction {
+	NonTerminal ne;
+	int jumpPoint;
+	BasicBlock failBB;
+	Instruction failjump;
+
+	public Icall(NonTerminal e, BasicBlock jumpBB) {
+		super(e, jumpBB);
 		this.op = Opcode.Icall;
 		this.ne = e;
 	}
 
 	public void setJump(int jump) {
-		this.jump = jump;
+		this.jumpPoint = jump;
 	}
 
 	@Override
@@ -74,7 +90,7 @@ class Icall extends Instruction {
 
 	@Override
 	public String toString() {
-		return "Icall " + ne.getLocalName() + " (" + this.jump + ")";
+		return "Icall " + ne.getLocalName() + " (" + this.jumpPoint + ")";
 	}
 
 	@Override
@@ -105,19 +121,6 @@ class Iret extends Instruction {
 	}
 }
 
-abstract class JumpInstruction extends Instruction {
-	BasicBlock jump;
-
-	public JumpInstruction(Expression e, BasicBlock jump) {
-		super(e);
-		this.jump = jump;
-	}
-
-	public BasicBlock getJumpBB() {
-		return this.jump;
-	}
-}
-
 class Ijump extends JumpInstruction {
 
 	public Ijump(Expression e, BasicBlock jump) {
@@ -127,12 +130,12 @@ class Ijump extends JumpInstruction {
 
 	@Override
 	public void stringfy(StringBuilder sb) {
-		sb.append("Ijump (").append(this.jump.getName()).append(")");
+		sb.append("Ijump (").append(this.jumpBB.getName()).append(")");
 	}
 
 	@Override
 	public String toString() {
-		return "Ijump (" + this.jump.codePoint + ")";
+		return "Ijump (" + this.jumpBB.codePoint + ")";
 	}
 
 	@Override
@@ -149,12 +152,12 @@ class Iiffail extends JumpInstruction {
 
 	@Override
 	public void stringfy(StringBuilder sb) {
-		sb.append("Iiffail (").append(this.jump.getName()).append(")");
+		sb.append("Iiffail (").append(this.jumpBB.getName()).append(")");
 	}
 
 	@Override
 	public String toString() {
-		return "Iiffail (" + this.jump.codePoint + ")";
+		return "Iiffail (" + this.jumpBB.codePoint + ")";
 	}
 
 	@Override
@@ -285,12 +288,12 @@ class Ichar extends JumpInstruction {
 	@Override
 	public void stringfy(StringBuilder sb) {
 		sb.append("Ichar ").append(StringUtils.stringfyCharacter(this.byteChar)).append(" ")
-				.append(this.jump.getName());
+				.append(this.jumpBB.getName());
 	}
 
 	@Override
 	public String toString() {
-		return "Ichar " + StringUtils.stringfyCharacter(this.byteChar) + " (" + this.jump.codePoint + ")";
+		return "Ichar " + StringUtils.stringfyCharacter(this.byteChar) + " (" + this.jumpBB.codePoint + ")";
 	}
 
 	@Override
@@ -311,12 +314,12 @@ class Icharclass extends JumpInstruction {
 	@Override
 	public void stringfy(StringBuilder sb) {
 		sb.append("Icharclass ").append(StringUtils.stringfyCharacterClass(this.byteMap)).append(" ")
-				.append(this.jump.getName());
+				.append(this.jumpBB.getName());
 	}
 
 	@Override
 	public String toString() {
-		return "Icharclass " + StringUtils.stringfyCharacterClass(this.byteMap) + " (" + this.jump.codePoint + ")";
+		return "Icharclass " + StringUtils.stringfyCharacterClass(this.byteMap) + " (" + this.jumpBB.codePoint + ")";
 	}
 
 	@Override
@@ -333,12 +336,12 @@ class Iany extends JumpInstruction {
 
 	@Override
 	public void stringfy(StringBuilder sb) {
-		sb.append("Iany ").append(this.jump.getName());
+		sb.append("Iany ").append(this.jumpBB.getName());
 	}
 
 	@Override
 	public String toString() {
-		return "Iany (" + this.jump.codePoint + ")";
+		return "Iany (" + this.jumpBB.codePoint + ")";
 	}
 
 	@Override
