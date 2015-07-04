@@ -40,6 +40,13 @@ public class DebugVMCompiler extends NezEncoder {
 		this.builder = new IRBuilder(new Module());
 	}
 
+	public Module compile(Grammar grammar) {
+		for(Production p : grammar.getProductionList()) {
+			this.encodeProduction(p);
+		}
+		return this.builder.getModule();
+	}
+
 	public Instruction encodeProduction(Production p) {
 		this.builder.setFunction(new Function(p.getLocalName()));
 		this.builder.setInsertPoint(new BasicBlock());
@@ -58,7 +65,7 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeFail(Expression p) {
-		// TODO Auto-generated method stub
+		this.builder.createIfail(p);
 		return null;
 	}
 
@@ -70,7 +77,7 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeByteChar(ByteChar p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		this.builder.createIchar(p, this.builder.jumpFailureJump());
 		return null;
 	}
 
