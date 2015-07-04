@@ -181,6 +181,9 @@ public class Grammar {
 		if(matched) {
 			ConsoleUtils.println("match!!");
 		}
+		else {
+			ConsoleUtils.println("unmatch!!");
+		}
 		return matched;
 	}
 
