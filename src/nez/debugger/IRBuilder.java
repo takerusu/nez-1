@@ -5,10 +5,12 @@ import nez.lang.ByteChar;
 import nez.lang.ByteMap;
 import nez.lang.Expression;
 import nez.lang.NonTerminal;
+import nez.lang.Production;
 
 public class IRBuilder {
 	private BasicBlock curBB;
 	private Module module;
+	private Function func;
 
 	public IRBuilder(Module m) {
 		this.module = m;
@@ -16,6 +18,14 @@ public class IRBuilder {
 
 	public Module getModule() {
 		return this.module;
+	}
+
+	public Function getFunction() {
+		return this.func;
+	}
+
+	public void setFunction(Function func) {
+		this.func = func;
 	}
 
 	public void setCurrentBB(BasicBlock bb) {
@@ -26,55 +36,89 @@ public class IRBuilder {
 		return this.curBB;
 	}
 
-	public Instruction createIexit(Expression e) {
+	class FailureBB {
+		BasicBlock fbb;
+		FailureBB prev;
+
+		public FailureBB(BasicBlock bb, FailureBB prev) {
+			this.fbb = bb;
+			this.prev = prev;
+		}
+	}
+
+	FailureBB fLabel = null;
+
+	public void pushFailureJumpPoint(BasicBlock bb) {
+		this.fLabel = new FailureBB(bb, this.fLabel);
+	}
+
+	public void popFailureJumpPoint(Production r) {
+		this.fLabel = this.fLabel.prev;
+	}
+
+	public BasicBlock popFailureJumpPoint(Expression e) {
+		BasicBlock fbb = this.fLabel.fbb;
+		this.fLabel = this.fLabel.prev;
+		return fbb;
+	}
+
+	public BasicBlock jumpFailureJump() {
+		return this.fLabel.fbb;
+	}
+
+	public BasicBlock jumpPrevFailureJump() {
+		return this.fLabel.prev.fbb;
+	}
+
+	public DebugVMInstruction createIexit(Expression e) {
 		return this.curBB.append(new Iexit(e));
 	}
 
-	public Instruction createIcall(NonTerminal e, BasicBlock jump, BasicBlock failjump) {
+	public DebugVMInstruction createIcall(NonTerminal e, BasicBlock jump, BasicBlock failjump) {
 		return this.curBB.append(new Icall(e, jump, failjump));
 	}
 
-	public Instruction createIret(Expression e) {
+	public DebugVMInstruction createIret(Expression e) {
 		return this.curBB.append(new Iret(e));
 	}
 
-	public Instruction createIjump(Expression e, BasicBlock jump) {
+	public DebugVMInstruction createIjump(Expression e, BasicBlock jump) {
 		return this.curBB.append(new Ijump(e, jump));
 	}
 
-	public Instruction createIiffail(Expression e, BasicBlock jump) {
+	public DebugVMInstruction createIiffail(Expression e, BasicBlock jump) {
 		return this.curBB.append(new Iiffail(e, jump));
 	}
 
-	public Instruction createIpush(Expression e) {
+	public DebugVMInstruction createIpush(Expression e) {
 		return this.curBB.append(new Ipush(e));
 	}
 
-	public Instruction createIpop(Expression e) {
+	public DebugVMInstruction createIpop(Expression e) {
 		return this.curBB.append(new Ipop(e));
 	}
 
-	public Instruction createIpeek(Expression e) {
+	public DebugVMInstruction createIpeek(Expression e) {
 		return this.curBB.append(new Ipeek(e));
 	}
 
-	public Instruction createIsucc(Expression e) {
+	public DebugVMInstruction createIsucc(Expression e) {
 		return this.curBB.append(new Isucc(e));
 	}
 
-	public Instruction createIfail(Expression e) {
+	public DebugVMInstruction createIfail(Expression e) {
 		return this.curBB.append(new Ifail(e));
 	}
 
-	public Instruction createIchar(ByteChar e, BasicBlock jump) {
+	public DebugVMInstruction createIchar(ByteChar e, BasicBlock jump) {
 		return this.curBB.append(new Ichar(e, jump));
 	}
 
-	public Instruction createIcharclass(ByteMap e, BasicBlock jump) {
+	public DebugVMInstruction createIcharclass(ByteMap e, BasicBlock jump) {
 		return this.curBB.append(new Icharclass(e, jump));
 	}
 
-	public Instruction createIany(AnyChar e, BasicBlock jump) {
+	public DebugVMInstruction createIany(AnyChar e, BasicBlock jump) {
 		return this.curBB.append(new Iany(e, jump));
 	}
 }

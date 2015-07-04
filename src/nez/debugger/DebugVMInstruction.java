@@ -6,12 +6,12 @@ import nez.lang.Expression;
 import nez.lang.NonTerminal;
 import nez.util.StringUtils;
 
-public abstract class Instruction {
+public abstract class DebugVMInstruction {
 	Opcode op;
 	Expression expr;
-	Instruction next;
+	DebugVMInstruction next;
 
-	public Instruction(Expression e) {
+	public DebugVMInstruction(Expression e) {
 		this.expr = e;
 	}
 
@@ -19,7 +19,7 @@ public abstract class Instruction {
 		return this.expr;
 	}
 
-	public void setNextInstruction(Instruction next) {
+	public void setNextInstruction(DebugVMInstruction next) {
 		this.next = next;
 	}
 
@@ -28,10 +28,10 @@ public abstract class Instruction {
 	@Override
 	public abstract String toString();
 
-	public abstract Instruction exec(Context ctx) throws MachineExitException;
+	public abstract DebugVMInstruction exec(Context ctx) throws MachineExitException;
 }
 
-class Iexit extends Instruction {
+class Iexit extends DebugVMInstruction {
 	public Iexit(Expression e) {
 		super(e);
 		this.op = Opcode.Iexit;
@@ -48,14 +48,14 @@ class Iexit extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIexit(this);
 	}
 }
 
-abstract class JumpInstruction extends Instruction {
+abstract class JumpInstruction extends DebugVMInstruction {
 	BasicBlock jumpBB;
-	Instruction jump;
+	DebugVMInstruction jump;
 
 	public JumpInstruction(Expression e, BasicBlock jump) {
 		super(e);
@@ -71,7 +71,7 @@ class Icall extends JumpInstruction {
 	NonTerminal ne;
 	int jumpPoint;
 	BasicBlock failBB;
-	Instruction failjump;
+	DebugVMInstruction failjump;
 
 	public Icall(NonTerminal e, BasicBlock jumpBB, BasicBlock failjumpBB) {
 		super(e, jumpBB);
@@ -95,12 +95,12 @@ class Icall extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIcall(this);
 	}
 }
 
-class Iret extends Instruction {
+class Iret extends DebugVMInstruction {
 	public Iret(Expression e) {
 		super(e);
 		this.op = Opcode.Iret;
@@ -117,7 +117,7 @@ class Iret extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIret(this);
 	}
 }
@@ -140,7 +140,7 @@ class Ijump extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIjump(this);
 	}
 }
@@ -162,12 +162,12 @@ class Iiffail extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIiffail(this);
 	}
 }
 
-class Ipush extends Instruction {
+class Ipush extends DebugVMInstruction {
 	public Ipush(Expression e) {
 		super(e);
 		this.op = Opcode.Ipush;
@@ -184,12 +184,12 @@ class Ipush extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIpush(this);
 	}
 }
 
-class Ipop extends Instruction {
+class Ipop extends DebugVMInstruction {
 	public Ipop(Expression e) {
 		super(e);
 		this.op = Opcode.Ipop;
@@ -206,12 +206,12 @@ class Ipop extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIpop(this);
 	}
 }
 
-class Ipeek extends Instruction {
+class Ipeek extends DebugVMInstruction {
 	public Ipeek(Expression e) {
 		super(e);
 		this.op = Opcode.Ipeek;
@@ -228,12 +228,12 @@ class Ipeek extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIpeek(this);
 	}
 }
 
-class Isucc extends Instruction {
+class Isucc extends DebugVMInstruction {
 	public Isucc(Expression e) {
 		super(e);
 		this.op = Opcode.Isucc;
@@ -250,12 +250,12 @@ class Isucc extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIsucc(this);
 	}
 }
 
-class Ifail extends Instruction {
+class Ifail extends DebugVMInstruction {
 	public Ifail(Expression e) {
 		super(e);
 		this.op = Opcode.Ifail;
@@ -272,7 +272,7 @@ class Ifail extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIfail(this);
 	}
 }
@@ -298,7 +298,7 @@ class Ichar extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIchar(this);
 	}
 }
@@ -324,7 +324,7 @@ class Icharclass extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIcharclass(this);
 	}
 }
@@ -346,7 +346,7 @@ class Iany extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) throws MachineExitException {
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIany(this);
 	}
 }

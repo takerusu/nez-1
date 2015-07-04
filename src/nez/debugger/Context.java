@@ -73,18 +73,18 @@ public abstract class Context implements Source {
 		return this.formatPositionLine("unconsumed", this.pos, "");
 	}
 
-	public final Instruction opIexit(Iexit inst) throws MachineExitException {
+	public final DebugVMInstruction opIexit(Iexit inst) throws MachineExitException {
 		throw new MachineExitException(result);
 	}
 
-	public final Instruction opIcall(Icall inst) {
+	public final DebugVMInstruction opIcall(Icall inst) {
 		StackEntry top = this.newStackEntry();
 		top.jump = inst.jump;
 		top.failjump = inst.failjump;
 		return inst.next;
 	}
 
-	public final Instruction opIret(Iret inst) {
+	public final DebugVMInstruction opIret(Iret inst) {
 		StackEntry top = this.popStack();
 		if(this.result) {
 			return top.jump;
@@ -92,44 +92,44 @@ public abstract class Context implements Source {
 		return top.failjump;
 	}
 
-	public final Instruction opIjump(Ijump inst) {
+	public final DebugVMInstruction opIjump(Ijump inst) {
 		return inst.jump;
 	}
 
-	public final Instruction opIiffail(Iiffail inst) {
+	public final DebugVMInstruction opIiffail(Iiffail inst) {
 		if(this.result) {
 			return inst.next;
 		}
 		return inst.jump;
 	}
 
-	public final Instruction opIpush(Ipush inst) {
+	public final DebugVMInstruction opIpush(Ipush inst) {
 		StackEntry top = this.newStackEntry();
 		top.pos = this.pos;
 		return inst.next;
 	}
 
-	public final Instruction opIpop(Ipop inst) {
+	public final DebugVMInstruction opIpop(Ipop inst) {
 		this.popStack();
 		return inst.next;
 	}
 
-	public final Instruction opIpeek(Ipeek inst) {
+	public final DebugVMInstruction opIpeek(Ipeek inst) {
 		this.pos = this.peekStack().pos;
 		return inst.next;
 	}
 
-	public final Instruction opIsucc(Isucc inst) {
+	public final DebugVMInstruction opIsucc(Isucc inst) {
 		this.result = true;
 		return inst.next;
 	}
 
-	public final Instruction opIfail(Ifail inst) {
+	public final DebugVMInstruction opIfail(Ifail inst) {
 		this.result = false;
 		return inst.next;
 	}
 
-	public final Instruction opIchar(Ichar inst) {
+	public final DebugVMInstruction opIchar(Ichar inst) {
 		if(this.byteAt(this.pos) == inst.byteChar) {
 			this.consume(1);
 			return inst.next;
@@ -137,7 +137,7 @@ public abstract class Context implements Source {
 		return inst.jump;
 	}
 
-	public final Instruction opIcharclass(Icharclass inst) {
+	public final DebugVMInstruction opIcharclass(Icharclass inst) {
 		int byteChar = this.byteAt(this.pos);
 		if(inst.byteMap[byteChar]) {
 			this.consume(1);
@@ -146,7 +146,7 @@ public abstract class Context implements Source {
 		return inst.jump;
 	}
 
-	public final Instruction opIany(Iany inst) {
+	public final DebugVMInstruction opIany(Iany inst) {
 		if(hasUnconsumed()) {
 			this.consume(1);
 			return inst.next;
@@ -156,7 +156,7 @@ public abstract class Context implements Source {
 }
 
 class StackEntry {
-	Instruction jump;
-	Instruction failjump;
+	DebugVMInstruction jump;
+	DebugVMInstruction failjump;
 	long pos;
 }

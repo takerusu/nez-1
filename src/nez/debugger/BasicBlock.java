@@ -6,29 +6,29 @@ import java.util.List;
 public class BasicBlock {
 	String name;
 	int codePoint;
-	List<Instruction> insts;
+	List<DebugVMInstruction> insts;
 	List<BasicBlock> preds;
 	List<BasicBlock> succs;
 
 	public BasicBlock() {
-		this.insts = new ArrayList<Instruction>();
+		this.insts = new ArrayList<DebugVMInstruction>();
 	}
 
-	public Instruction get(int index) {
+	public DebugVMInstruction get(int index) {
 		return this.insts.get(index);
 	}
 
-	public Instruction append(Instruction inst) {
+	public DebugVMInstruction append(DebugVMInstruction inst) {
 		this.insts.add(inst);
 		return inst;
 	}
 
-	public BasicBlock add(int index, Instruction inst) {
+	public BasicBlock add(int index, DebugVMInstruction inst) {
 		this.insts.add(index, inst);
 		return this;
 	}
 
-	public Instruction remove(int index) {
+	public DebugVMInstruction remove(int index) {
 		return this.insts.remove(index);
 	}
 
@@ -36,7 +36,7 @@ public class BasicBlock {
 		return this.insts.size();
 	}
 
-	public int indexOf(Instruction inst) {
+	public int indexOf(DebugVMInstruction inst) {
 		return this.insts.indexOf(inst);
 	}
 

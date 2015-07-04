@@ -32,12 +32,12 @@ public class Function {
 		return this.bbList.remove(index);
 	}
 
-	public List<Instruction> serchInst(Expression e) {
-		List<Instruction> ilist = new ArrayList<Instruction>();
+	public List<DebugVMInstruction> serchInst(Expression e) {
+		List<DebugVMInstruction> ilist = new ArrayList<DebugVMInstruction>();
 		for(int i = 0; i < this.size(); i++) {
 			BasicBlock bb = this.get(i);
 			for(int j = 0; j < bb.size(); j++) {
-				Instruction inst = bb.get(j);
+				DebugVMInstruction inst = bb.get(j);
 				if(inst.expr.equals(e)) {
 					ilist.add(inst);
 				}
