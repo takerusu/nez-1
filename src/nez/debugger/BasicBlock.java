@@ -12,6 +12,8 @@ public class BasicBlock {
 
 	public BasicBlock() {
 		this.insts = new ArrayList<DebugVMInstruction>();
+		this.preds = new ArrayList<BasicBlock>();
+		this.succs = new ArrayList<BasicBlock>();
 	}
 
 	public DebugVMInstruction get(int index) {
@@ -42,6 +44,7 @@ public class BasicBlock {
 
 	public void stringfy(StringBuilder sb) {
 		for(int i = 0; i < this.size(); i++) {
+			sb.append("  ");
 			this.get(i).stringfy(sb);
 			sb.append("\n");
 		}
@@ -69,5 +72,13 @@ public class BasicBlock {
 
 	public BasicBlock getFailSuccessor() {
 		return this.succs.get(1);
+	}
+
+	public void setSingleSuccessor(BasicBlock bb) {
+		this.succs.add(0, bb);
+	}
+
+	public void setFailSuccessor(BasicBlock bb) {
+		this.succs.add(1, bb);
 	}
 }
