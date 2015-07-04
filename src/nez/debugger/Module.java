@@ -15,7 +15,11 @@ public class Module {
 	public DebugVMInstruction getStartPoint() {
 		for(Function func : this.funcList) {
 			if(func.funcName.equals("File")) {
-				return func.get(0).get(0);
+				BasicBlock bb = func.get(0);
+				while(bb.size() == 0) {
+					bb = bb.getSingleSuccessor();
+				}
+				return bb.get(0);
 			}
 		}
 		ConsoleUtils.exit(1, "error: StartPoint is not found");
