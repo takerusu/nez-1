@@ -18,9 +18,9 @@ public class BasicBlock {
 		return this.insts.get(index);
 	}
 
-	public BasicBlock append(Instruction inst) {
+	public Instruction append(Instruction inst) {
 		this.insts.add(inst);
-		return this;
+		return inst;
 	}
 
 	public BasicBlock add(int index, Instruction inst) {

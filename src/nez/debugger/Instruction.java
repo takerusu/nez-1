@@ -73,10 +73,11 @@ class Icall extends JumpInstruction {
 	BasicBlock failBB;
 	Instruction failjump;
 
-	public Icall(NonTerminal e, BasicBlock jumpBB) {
+	public Icall(NonTerminal e, BasicBlock jumpBB, BasicBlock failjumpBB) {
 		super(e, jumpBB);
 		this.op = Opcode.Icall;
 		this.ne = e;
+		this.failBB = failjumpBB;
 	}
 
 	public void setJump(int jump) {
