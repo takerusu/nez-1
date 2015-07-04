@@ -167,7 +167,9 @@ public class Grammar {
 	public final boolean debug(DebugSourceContext s) {
 		boolean matched;
 		DebugVMInstruction pc;
+		this.option.setOption("intern", false);
 		DebugVMCompiler c = new DebugVMCompiler(this.option);
+		s.initContext();
 		pc = c.compile(this).getStartPoint();
 		NezDebugger debugger = new NezDebugger();
 		matched = debugger.exec(pc, s);
@@ -176,6 +178,9 @@ public class Grammar {
 //		if(matched) {
 //			s.newTopLevelNode();
 //		}
+		if(matched) {
+			ConsoleUtils.println("match!!");
+		}
 		return matched;
 	}
 
