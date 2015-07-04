@@ -18,6 +18,14 @@ public class Function {
 		return this.bbList.get(index);
 	}
 
+	public DebugVMInstruction getStartInstruction() {
+		BasicBlock bb = this.get(0);
+		while(bb.size() == 0) {
+			bb = bb.getSingleSuccessor();
+		}
+		return bb.get(0);
+	}
+
 	public Function append(BasicBlock bb) {
 		this.bbList.add(bb);
 		return this;

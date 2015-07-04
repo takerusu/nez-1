@@ -15,11 +15,7 @@ public class Module {
 	public DebugVMInstruction getStartPoint() {
 		for(Function func : this.funcList) {
 			if(func.funcName.equals("File")) {
-				BasicBlock bb = func.get(0);
-				while(bb.size() == 0) {
-					bb = bb.getSingleSuccessor();
-				}
-				return bb.get(0);
+				return func.getStartInstruction();
 			}
 		}
 		ConsoleUtils.exit(1, "error: StartPoint is not found");
@@ -28,6 +24,16 @@ public class Module {
 
 	public Function get(int index) {
 		return this.funcList.get(index);
+	}
+
+	public Function get(String name) {
+		for(Function func : this.funcList) {
+			if(func.funcName.equals(name)) {
+				return func;
+			}
+		}
+		ConsoleUtils.exit(1, "error: NonTerminal is not found " + name);
+		return null;
 	}
 
 	public void append(Function func) {

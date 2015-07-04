@@ -29,20 +29,22 @@ public class IRBuilder {
 			DebugVMInstruction prev = null;
 			for(BasicBlock bb : f.bbList) {
 				for(DebugVMInstruction inst : bb.insts) {
-					if(prev != null) {
+					if(prev != null && prev.next == null) {
 						prev.next = inst;
 					}
-					if(inst instanceof JumpInstruction) {
+					if(inst.op.equals(Opcode.Icall)) {
+						Icall call = (Icall) inst;
+						Function callFunc = this.module.get(call.ne.getLocalName());
+						call.setJump(callFunc.get(0).codePoint);
+						call.next = callFunc.getStartInstruction();
+						bb.setSingleSuccessor(call.jumpBB);
+						call.jump = call.jumpBB.getStartInstruction();
+						bb.setFailSuccessor(call.failBB);
+						call.failjump = call.failBB.getStartInstruction();
+					} else if(inst instanceof JumpInstruction) {
 						JumpInstruction jinst = (JumpInstruction) inst;
 						BasicBlock jbb = jinst.jumpBB;
-						if(jbb.size() != 0) {
-							jinst.jump = jinst.jumpBB.get(0);
-						} else {
-							while(jbb.size() == 0) {
-								jbb = jbb.getSingleSuccessor();
-							}
-							jinst.jump = jbb.get(0);
-						}
+						jinst.jump = jbb.getStartInstruction();
 					}
 					prev = inst;
 				}

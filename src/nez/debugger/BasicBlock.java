@@ -20,6 +20,14 @@ public class BasicBlock {
 		return this.insts.get(index);
 	}
 
+	public DebugVMInstruction getStartInstruction() {
+		BasicBlock bb = this;
+		while(bb.size() == 0) {
+			bb = bb.getSingleSuccessor();
+		}
+		return bb.get(0);
+	}
+
 	public DebugVMInstruction append(DebugVMInstruction inst) {
 		this.insts.add(inst);
 		return inst;
