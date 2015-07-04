@@ -49,8 +49,8 @@ public abstract class Context implements Source {
 		return this.formatPositionLine("unconsumed", this.pos, "");
 	}
 
-	public final Instruction opIexit(Iexit inst) {
-		return null;
+	public final Instruction opIexit(Iexit inst) throws MachineExitException {
+		throw new MachineExitException(result);
 	}
 
 	public final Instruction opIcall(Icall inst) {

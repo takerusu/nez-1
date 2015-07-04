@@ -28,7 +28,7 @@ public abstract class Instruction {
 	@Override
 	public abstract String toString();
 
-	public abstract Instruction exec(Context ctx);
+	public abstract Instruction exec(Context ctx) throws MachineExitException;
 }
 
 class Iexit extends Instruction {
@@ -48,7 +48,7 @@ class Iexit extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIexit(this);
 	}
 }
@@ -78,7 +78,7 @@ class Icall extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIcall(this);
 	}
 }
@@ -100,7 +100,7 @@ class Iret extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIret(this);
 	}
 }
@@ -136,7 +136,7 @@ class Ijump extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIjump(this);
 	}
 }
@@ -158,7 +158,7 @@ class Iiffail extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIiffail(this);
 	}
 }
@@ -180,7 +180,7 @@ class Ipush extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIpush(this);
 	}
 }
@@ -202,7 +202,7 @@ class Ipop extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIpop(this);
 	}
 }
@@ -224,7 +224,7 @@ class Ipeek extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIpeek(this);
 	}
 }
@@ -246,7 +246,7 @@ class Isucc extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIsucc(this);
 	}
 }
@@ -268,7 +268,7 @@ class Ifail extends Instruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIfail(this);
 	}
 }
@@ -294,7 +294,7 @@ class Ichar extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIchar(this);
 	}
 }
@@ -320,7 +320,7 @@ class Icharclass extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIcharclass(this);
 	}
 }
@@ -342,7 +342,7 @@ class Iany extends JumpInstruction {
 	}
 
 	@Override
-	public Instruction exec(Context ctx) {
+	public Instruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIany(this);
 	}
 }
