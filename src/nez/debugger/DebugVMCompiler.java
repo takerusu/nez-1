@@ -192,7 +192,25 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeChoice(Choice p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		BasicBlock fbb = null;
+		BasicBlock mergebb = new BasicBlock();
+		this.builder.createIpush(p);
+		for(int i = 0; i < p.size(); i++) {
+			fbb = new BasicBlock();
+			this.builder.pushFailureJumpPoint(fbb);
+			p.get(i).encode(this, next, failjump);
+			this.builder.createIjump(p, mergebb);
+			this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
+			if(i != p.size() - 1) {
+				this.builder.createIsucc(p);
+				this.builder.createIpeek(p);
+			} else {
+				this.builder.createIpop(p);
+			}
+		}
+		this.builder.createIjump(p, this.builder.jumpFailureJump());
+		this.builder.setInsertPoint(mergebb);
+		this.builder.createIpop(p);
 		return null;
 	}
 
