@@ -216,7 +216,9 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeNonTerminal(NonTerminal p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		BasicBlock rbb = new BasicBlock();
+		this.builder.createIcall(p, rbb, this.builder.jumpFailureJump());
+		this.builder.setInsertPoint(rbb);
 		return null;
 	}
 
