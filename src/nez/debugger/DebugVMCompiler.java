@@ -156,7 +156,12 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeAnd(And p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		this.builder.createIpush(p);
+		p.get(0).encode(this, next, failjump);
+		this.builder.createIpeek(p);
+		this.builder.createIpop(p);
+		this.builder.createIiffail(p, this.builder.jumpFailureJump());
+		this.builder.setInsertPoint(new BasicBlock());
 		return null;
 	}
 
