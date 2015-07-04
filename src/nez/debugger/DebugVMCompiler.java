@@ -184,7 +184,9 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeSequence(Sequence p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		for(int i = 0; i < p.size(); i++) {
+			p.get(i).encode(this, next, failjump);
+		}
 		return null;
 	}
 
