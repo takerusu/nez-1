@@ -25,7 +25,13 @@ public class IRBuilder {
 	}
 
 	public void setFunction(Function func) {
+		this.module.append(func);
 		this.func = func;
+	}
+
+	public void setCurrentBBtoFunc(BasicBlock bb) {
+		this.func.append(bb);
+		this.curBB = bb;
 	}
 
 	public void setCurrentBB(BasicBlock bb) {
