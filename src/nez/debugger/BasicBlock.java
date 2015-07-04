@@ -51,6 +51,10 @@ public class BasicBlock {
 		return this.name;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public List<BasicBlock> getPredecessors() {
 		return this.preds;
 	}
