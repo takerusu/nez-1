@@ -1,9 +1,14 @@
 package nez.debugger;
 
+import nez.ast.Tag;
 import nez.lang.ByteChar;
 import nez.lang.ByteMap;
 import nez.lang.Expression;
+import nez.lang.Link;
+import nez.lang.New;
 import nez.lang.NonTerminal;
+import nez.lang.Replace;
+import nez.lang.Tagging;
 import nez.util.StringUtils;
 
 public abstract class DebugVMInstruction {
@@ -348,5 +353,196 @@ class Iany extends JumpInstruction {
 	@Override
 	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIany(this);
+	}
+}
+
+class Inew extends DebugVMInstruction {
+	public Inew(Expression e) {
+		super(e);
+		this.op = Opcode.Inew;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Inew");
+	}
+
+	@Override
+	public String toString() {
+		return "Inew";
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opInew(this);
+	}
+}
+
+class Ileftnew extends DebugVMInstruction {
+	int index;
+
+	public Ileftnew(New e) {
+		super(e);
+		this.op = Opcode.Ileftnew;
+		this.index = e.shift;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Ileftnew ").append(this.index);
+	}
+
+	@Override
+	public String toString() {
+		return "Ileftnew " + this.index;
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIleftnew(this);
+	}
+}
+
+class Icapture extends DebugVMInstruction {
+	public Icapture(Expression e) {
+		super(e);
+		this.op = Opcode.Icapture;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Icapture");
+	}
+
+	@Override
+	public String toString() {
+		return "Icapture";
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIcapture(this);
+	}
+}
+
+class Ilink extends DebugVMInstruction {
+	int index;
+
+	public Ilink(Link e) {
+		super(e);
+		this.op = Opcode.Ilink;
+		this.index = e.index;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Ilink ").append(this.index);
+	}
+
+	@Override
+	public String toString() {
+		return "Ilink " + this.index;
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIlink(this);
+	}
+}
+
+class Itag extends DebugVMInstruction {
+	Tag tag;
+
+	public Itag(Tagging e) {
+		super(e);
+		this.op = Opcode.Itag;
+		this.tag = e.tag;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Itag " + tag.getName());
+	}
+
+	@Override
+	public String toString() {
+		return "Itag " + tag.getName();
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opItag(this);
+	}
+}
+
+class Ireplace extends DebugVMInstruction {
+	String value;
+
+	public Ireplace(Replace e) {
+		super(e);
+		this.op = Opcode.Ireplace;
+		this.value = e.value;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Ireplace ").append(this.value);
+	}
+
+	@Override
+	public String toString() {
+		return "Ireplace " + this.value;
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIreplace(this);
+	}
+}
+
+class Icommit extends DebugVMInstruction {
+	int index;
+
+	public Icommit(Link e) {
+		super(e);
+		this.op = Opcode.Icommit;
+		this.index = e.index;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Icommit ").append(this.index);
+	}
+
+	@Override
+	public String toString() {
+		return "Icommit " + this.index;
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIcommit(this);
+	}
+}
+
+class Iabort extends DebugVMInstruction {
+	public Iabort(Expression e) {
+		super(e);
+		this.op = Opcode.Iabort;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Iabort");
+	}
+
+	@Override
+	public String toString() {
+		return "Iabort";
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIabort(this);
 	}
 }

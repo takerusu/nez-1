@@ -13,5 +13,13 @@ public enum Opcode {
 	Ifail,
 	Ichar,
 	Icharclass,
-	Iany
+	Iany,
+	Inew,
+	Ileftnew,
+	Icapture,
+	Ilink,
+	Itag,
+	Ireplace,
+	Icommit,
+	Iabort
 }
