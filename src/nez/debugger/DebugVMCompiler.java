@@ -120,17 +120,15 @@ public class DebugVMCompiler extends NezEncoder {
 		BasicBlock topBB = new BasicBlock();
 		this.builder.setInsertPoint(topBB);
 		BasicBlock fbb = new BasicBlock();
-		BasicBlock mergebb = new BasicBlock();
 		this.builder.pushFailureJumpPoint(fbb);
 		this.builder.createIpush(p);
 		p.get(0).encode(this, next, null);
 		this.builder.createIpop(p);
-		this.builder.createIjump(p, mergebb);
+		this.builder.createIjump(p, topBB);
 		this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
 		this.builder.createIsucc(p);
 		this.builder.createIpeek(p);
 		this.builder.createIpop(p);
-		this.builder.setInsertPoint(mergebb);
 		return null;
 	}
 
@@ -140,17 +138,15 @@ public class DebugVMCompiler extends NezEncoder {
 		BasicBlock topBB = new BasicBlock();
 		this.builder.setInsertPoint(topBB);
 		BasicBlock fbb = new BasicBlock();
-		BasicBlock mergebb = new BasicBlock();
 		this.builder.pushFailureJumpPoint(fbb);
 		this.builder.createIpush(p);
 		p.get(0).encode(this, next, failjump);
 		this.builder.createIpop(p);
-		this.builder.createIjump(p, mergebb);
+		this.builder.createIjump(p, topBB);
 		this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
 		this.builder.createIsucc(p);
 		this.builder.createIpeek(p);
 		this.builder.createIpop(p);
-		this.builder.setInsertPoint(mergebb);
 		return null;
 	}
 
@@ -224,7 +220,7 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeLink(Link p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		p.get(0).encode(this, next, failjump);
 		return null;
 	}
 

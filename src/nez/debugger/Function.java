@@ -73,8 +73,9 @@ public class Function {
 	public void stringfy(StringBuilder sb) {
 		sb.append(this.funcName + ":\n");
 		for(int i = 0; i < this.size(); i++) {
-			sb.append("bb" + i + " {\n");
-			this.get(i).stringfy(sb);
+			BasicBlock bb = this.get(i);
+			sb.append(bb.name + " {\n");
+			bb.stringfy(sb);
 			sb.append("}\n");
 		}
 		sb.append("\n");

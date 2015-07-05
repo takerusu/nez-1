@@ -86,7 +86,7 @@ class Icall extends JumpInstruction {
 
 	@Override
 	public void stringfy(StringBuilder sb) {
-		sb.append("Icall " + ne.getLocalName());
+		sb.append("Icall " + ne.getLocalName() + " jmp:" + this.jumpBB.name + " fail:" + this.failBB.name);
 	}
 
 	@Override
