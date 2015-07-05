@@ -21,5 +21,13 @@ public enum Opcode {
 	Itag,
 	Ireplace,
 	Icommit,
-	Iabort
+	Iabort,
+	Idef,
+	Iis,
+	Iisa,
+	Iexists,
+	Ibeginscope,
+	Ibeginlocalscope,
+	Iendscope,
+	Iendscopefail
 }

@@ -3,8 +3,12 @@ package nez.debugger;
 import nez.ast.Tag;
 import nez.lang.ByteChar;
 import nez.lang.ByteMap;
+import nez.lang.DefSymbol;
+import nez.lang.ExistsSymbol;
 import nez.lang.Expression;
+import nez.lang.IsSymbol;
 import nez.lang.Link;
+import nez.lang.LocalTable;
 import nez.lang.New;
 import nez.lang.NonTerminal;
 import nez.lang.Replace;
@@ -541,5 +545,196 @@ class Iabort extends DebugVMInstruction {
 	@Override
 	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIabort(this);
+	}
+}
+
+class Idef extends DebugVMInstruction {
+	Tag tableName;
+
+	public Idef(DefSymbol e) {
+		super(e);
+		this.op = Opcode.Idef;
+		this.tableName = e.tableName;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Idef ").append(this.tableName.getName());
+	}
+
+	@Override
+	public String toString() {
+		return "Idef " + this.tableName.getName();
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIdef(this);
+	}
+}
+
+class Iis extends DebugVMInstruction {
+	Tag tableName;
+
+	public Iis(IsSymbol e) {
+		super(e);
+		this.op = Opcode.Iis;
+		this.tableName = e.tableName;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Iis ").append(this.tableName.getName());
+	}
+
+	@Override
+	public String toString() {
+		return "Iis " + this.tableName.getName();
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIis(this);
+	}
+}
+
+class Iisa extends DebugVMInstruction {
+	Tag tableName;
+
+	public Iisa(IsSymbol e) {
+		super(e);
+		this.op = Opcode.Iisa;
+		this.tableName = e.tableName;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Iisa ").append(this.tableName.getName());
+	}
+
+	@Override
+	public String toString() {
+		return "Iisa " + this.tableName.getName();
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIisa(this);
+	}
+}
+
+class Iexists extends DebugVMInstruction {
+	Tag tableName;
+
+	public Iexists(ExistsSymbol e) {
+		super(e);
+		this.op = Opcode.Iexists;
+		this.tableName = e.tableName;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Iexists ").append(this.tableName.getName());
+	}
+
+	@Override
+	public String toString() {
+		return "Iexists " + this.tableName.getName();
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIexists(this);
+	}
+}
+
+class Ibeginscope extends DebugVMInstruction {
+	public Ibeginscope(Expression e) {
+		super(e);
+		this.op = Opcode.Ibeginscope;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Ibeginscope");
+	}
+
+	@Override
+	public String toString() {
+		return "Ibeginscope";
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIbeginscope(this);
+	}
+}
+
+class Ibeginlocalscope extends DebugVMInstruction {
+	Tag tableName;
+
+	public Ibeginlocalscope(LocalTable e) {
+		super(e);
+		this.op = Opcode.Ibeginlocalscope;
+		this.tableName = e.tableName;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Ibeginlocalscope ").append(this.tableName.getName());
+	}
+
+	@Override
+	public String toString() {
+		return "Ibeginlocalscope " + this.tableName.getName();
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIbeginlocalscope(this);
+	}
+}
+
+class Iendscope extends DebugVMInstruction {
+	public Iendscope(Expression e) {
+		super(e);
+		this.op = Opcode.Iendscope;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Iendscope");
+	}
+
+	@Override
+	public String toString() {
+		return "Iendscope";
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIendscope(this);
+	}
+}
+
+class Iendscopefail extends DebugVMInstruction {
+	public Iendscopefail(Expression e) {
+		super(e);
+		this.op = Opcode.Iendscopefail;
+	}
+
+	@Override
+	public void stringfy(StringBuilder sb) {
+		sb.append("Iendscopefail");
+	}
+
+	@Override
+	public String toString() {
+		return "Iendscopefail";
+	}
+
+	@Override
+	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
+		return ctx.opIendscopefail(this);
 	}
 }
