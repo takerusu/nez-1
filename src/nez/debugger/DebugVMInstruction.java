@@ -425,28 +425,25 @@ class Icapture extends DebugVMInstruction {
 	}
 }
 
-class Ilink extends DebugVMInstruction {
-	int index;
-
-	public Ilink(Link e) {
+class Imark extends DebugVMInstruction {
+	public Imark(Expression e) {
 		super(e);
-		this.op = Opcode.Ilink;
-		this.index = e.index;
+		this.op = Opcode.Imark;
 	}
 
 	@Override
 	public void stringfy(StringBuilder sb) {
-		sb.append("Ilink ").append(this.index);
+		sb.append("Imark");
 	}
 
 	@Override
 	public String toString() {
-		return "Ilink " + this.index;
+		return "Imark";
 	}
 
 	@Override
 	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
-		return ctx.opIlink(this);
+		return ctx.opImark(this);
 	}
 }
 

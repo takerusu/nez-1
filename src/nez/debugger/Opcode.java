@@ -17,7 +17,7 @@ public enum Opcode {
 	Inew,
 	Ileftnew,
 	Icapture,
-	Ilink,
+	Imark,
 	Itag,
 	Ireplace,
 	Icommit,

@@ -204,8 +204,8 @@ public class IRBuilder {
 		return this.curBB.append(new Icapture(e));
 	}
 
-	public DebugVMInstruction createIlink(Link e) {
-		return this.curBB.append(new Ilink(e));
+	public DebugVMInstruction createImark(Expression e) {
+		return this.curBB.append(new Imark(e));
 	}
 
 	public DebugVMInstruction createItag(Tagging e) {
