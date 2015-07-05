@@ -4,7 +4,11 @@ import nez.lang.AnyChar;
 import nez.lang.ByteChar;
 import nez.lang.ByteMap;
 import nez.lang.Expression;
+import nez.lang.Link;
+import nez.lang.New;
 import nez.lang.NonTerminal;
+import nez.lang.Replace;
+import nez.lang.Tagging;
 
 public class IRBuilder {
 	private BasicBlock curBB;
@@ -186,5 +190,37 @@ public class IRBuilder {
 
 	public DebugVMInstruction createIany(AnyChar e, BasicBlock jump) {
 		return this.curBB.append(new Iany(e, jump));
+	}
+
+	public DebugVMInstruction createInew(Expression e) {
+		return this.curBB.append(new Inew(e));
+	}
+
+	public DebugVMInstruction createIleftnew(New e) {
+		return this.curBB.append(new Ileftnew(e));
+	}
+
+	public DebugVMInstruction createIcapture(Expression e) {
+		return this.curBB.append(new Icapture(e));
+	}
+
+	public DebugVMInstruction createIlink(Link e) {
+		return this.curBB.append(new Ilink(e));
+	}
+
+	public DebugVMInstruction createItag(Tagging e) {
+		return this.curBB.append(new Itag(e));
+	}
+
+	public DebugVMInstruction createIreplace(Replace e) {
+		return this.curBB.append(new Ireplace(e));
+	}
+
+	public DebugVMInstruction createIcommit(Link e) {
+		return this.curBB.append(new Icommit(e));
+	}
+
+	public DebugVMInstruction createIabort(Expression e) {
+		return this.curBB.append(new Iabort(e));
 	}
 }
