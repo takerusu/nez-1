@@ -16,6 +16,7 @@ import nez.util.ConsoleUtils;
 public class NezDebugger {
 	HashMap<String, BreakPoint> breakPointMap = new HashMap<String, BreakPoint>();
 	HashMap<String, Production> ruleMap = new HashMap<String, Production>();
+	List<String> nameList = new ArrayList<String>();
 	DebugOperator command = null;
 	Grammar peg;
 	DebugVMInstruction code;
@@ -30,7 +31,9 @@ public class NezDebugger {
 		this.sc = sc;
 		for(Production p : peg.getProductionList()) {
 			this.ruleMap.put(p.getLocalName(), p);
+			this.nameList.add(p.getLocalName());
 		}
+		ConsoleUtils.addCompleter(this.nameList);
 	}
 
 	class BreakPoint {
@@ -71,6 +74,17 @@ public class NezDebugger {
 			result = e.result;
 		}
 		return result;
+	}
+
+	public boolean execCode() throws MachineExitException {
+		if(this.code instanceof Icall) {
+			if(this.breakPointMap.containsKey(((Icall) this.code).ne.getLocalName())) {
+				this.code = this.code.exec(this.sc);
+				return false;
+			}
+		}
+		this.code = this.code.exec(this.sc);
+		return true;
 	}
 
 	public void showCurrentExpression() {
@@ -194,7 +208,37 @@ public class NezDebugger {
 	}
 
 	public boolean exec(Print o) {
-
+		if(o.type == Print.printContext) {
+			Context ctx = (Context) sc;
+			if(o.code == null) {
+				ConsoleUtils.println("context {");
+				ConsoleUtils.println("  input_name = " + ctx.getResourceName());
+				ConsoleUtils.println("  pos = " + ctx.getPosition());
+				Object obj = ctx.getLeftObject();
+				if(obj == null) {
+					ConsoleUtils.println("  left = " + ctx.getLeftObject());
+				} else {
+					ConsoleUtils.println("  left = " + ctx.getLeftObject().hashCode());
+				}
+				ConsoleUtils.println("}");
+			} else if(o.code.equals("pos")) {
+				ConsoleUtils.println("pos = " + ctx.getPosition());
+				ConsoleUtils.println(sc.formatDebugPositionLine(((Context) sc).getPosition(), ""));
+			} else if(o.code.equals("input_name")) {
+				ConsoleUtils.println("input_name = " + ctx.getResourceName());
+			} else if(o.code.equals("left")) {
+				ConsoleUtils.println("left = " + ctx.getLeftObject());
+			} else {
+				ConsoleUtils.println("error: no member nameed \'" + o.code + "\' in context");
+			}
+		} else if(o.type == Print.printProduction) {
+			Production rule = ruleMap.get(o.code);
+			if(rule != null) {
+				ConsoleUtils.println(rule.toString());
+			} else {
+				ConsoleUtils.println("error: production not found '" + o.code + "'");
+			}
+		}
 		return true;
 	}
 
@@ -235,7 +279,25 @@ public class NezDebugger {
 	}
 
 	public boolean exec(StepOver o) throws MachineExitException {
-
+		if(this.code.op.equals(Opcode.Icall)) {
+			int stackTop = this.sc.StackTop;
+			while(stackTop <= this.sc.StackTop) {
+				if(!this.execCode()) {
+					break;
+				}
+			}
+			return true;
+		} else {
+			Expression e = this.code.getExpression();
+			Expression current = this.code.getExpression();
+			while(e.equals(current)) {
+				this.code = this.code.exec(this.sc);
+				current = this.code.getExpression();
+			}
+		}
+		if(this.code.op.equals(Opcode.Iret)) {
+			this.code = this.code.exec(this.sc);
+		}
 		return true;
 	}
 
@@ -255,13 +317,9 @@ public class NezDebugger {
 
 	public boolean exec(Run o) throws MachineExitException {
 		while(true) {
-			if(this.code instanceof Icall) {
-				if(this.breakPointMap.containsKey(((Icall) this.code).ne.getLocalName())) {
-					this.code = this.code.exec(this.sc);
-					return true;
-				}
+			if(!this.execCode()) {
+				return true;
 			}
-			this.code = this.code.exec(this.sc);
 		}
 	}
 
