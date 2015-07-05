@@ -3,8 +3,12 @@ package nez.debugger;
 import nez.lang.AnyChar;
 import nez.lang.ByteChar;
 import nez.lang.ByteMap;
+import nez.lang.DefSymbol;
+import nez.lang.ExistsSymbol;
 import nez.lang.Expression;
+import nez.lang.IsSymbol;
 import nez.lang.Link;
+import nez.lang.LocalTable;
 import nez.lang.New;
 import nez.lang.NonTerminal;
 import nez.lang.Replace;
@@ -222,5 +226,37 @@ public class IRBuilder {
 
 	public DebugVMInstruction createIabort(Expression e) {
 		return this.curBB.append(new Iabort(e));
+	}
+
+	public DebugVMInstruction createIdef(DefSymbol e) {
+		return this.curBB.append(new Idef(e));
+	}
+
+	public DebugVMInstruction createIis(IsSymbol e) {
+		return this.curBB.append(new Iis(e));
+	}
+
+	public DebugVMInstruction createIisa(IsSymbol e) {
+		return this.curBB.append(new Iisa(e));
+	}
+
+	public DebugVMInstruction createIexists(ExistsSymbol e) {
+		return this.curBB.append(new Iexists(e));
+	}
+
+	public DebugVMInstruction createIbeginscope(Expression e) {
+		return this.curBB.append(new Ibeginscope(e));
+	}
+
+	public DebugVMInstruction createIbeginlocalscope(LocalTable e) {
+		return this.curBB.append(new Ibeginlocalscope(e));
+	}
+
+	public DebugVMInstruction createIendscope(Expression e) {
+		return this.curBB.append(new Iendscope(e));
+	}
+
+	public DebugVMInstruction createIendscopefail(Expression e) {
+		return this.curBB.append(new Iendscopefail(e));
 	}
 }
