@@ -152,11 +152,10 @@ public class DebugFileContext extends DebugSourceContext {
 
 	@Override
 	public final byte[] subbyte(long startIndex, long endIndex) {
-		byte[] b = null;
+		byte[] b = new byte[(int) (endIndex - startIndex)];
 		if(endIndex > startIndex) {
 			long off_s = buffer_alignment(startIndex);
 			long off_e = buffer_alignment(endIndex);
-			b = new byte[(int) (endIndex - startIndex)];
 			if(off_s == off_e) {
 				if(this.buffer_offset != off_s) {
 					this.buffer_offset = off_s;

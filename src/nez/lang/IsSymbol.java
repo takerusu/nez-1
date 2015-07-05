@@ -14,7 +14,7 @@ public class IsSymbol extends Expression implements Contextual {
 		super(s);
 		this.ns = ns;
 		this.tableName = tableName;
-		this.checkLastSymbolOnly = false;
+		this.checkLastSymbolOnly = checkLastSymbolOnly;
 	}
 	@Override
 	public final boolean equalsExpression(Expression o) {
