@@ -4,6 +4,7 @@ import nez.ast.CommonTreeTransducer;
 import nez.ast.Source;
 import nez.ast.Tag;
 import nez.ast.TreeTransducer;
+import nez.vm.SymbolTable;
 
 public abstract class Context implements Source {
 	long pos;
@@ -16,6 +17,7 @@ public abstract class Context implements Source {
 	public final void initContext() {
 		this.result = true;
 		this.lastAppendedLog = new ASTLog();
+		this.symbolTable = new SymbolTable();
 		this.stack = new StackEntry[StackSize];
 		for(int i = 0; i < this.stack.length; i++) {
 			this.stack[i] = new StackEntry();
@@ -319,6 +321,62 @@ public abstract class Context implements Source {
 		this.logAbort(this.popStack().mark, true);
 		return inst.next;
 	}
+
+	/*
+	 * Symbol Table Part
+	 */
+
+	private SymbolTable symbolTable;
+
+	public final DebugVMInstruction opIdef(Idef inst) {
+		StackEntry top = this.popStack();
+		byte[] captured = this.subbyte(top.pos, this.pos);
+		this.symbolTable.addTable(inst.tableName, captured);
+		return inst.next;
+	}
+
+	public final DebugVMInstruction opIis(Iis inst) {
+		byte[] t = this.symbolTable.getSymbol(inst.tableName);
+		if(t != null && this.match(this.pos, t)) {
+			this.consume(t.length);
+			return inst.next;
+		}
+		return inst.jump;
+	}
+
+	public final DebugVMInstruction opIisa(Iisa inst) {
+		StackEntry top = this.popStack();
+		byte[] captured = this.subbyte(top.pos, this.pos);
+		if(this.symbolTable.contains2(inst.tableName, captured)) {
+			this.consume(captured.length);
+			return inst.next;
+		}
+		return inst.jump;
+	}
+
+	public final DebugVMInstruction opIexists(Iexists inst) {
+		byte[] t = this.symbolTable.getSymbol(inst.tableName);
+		return t != null ? inst.next : inst.jump;
+	}
+
+	public final DebugVMInstruction opIbeginscope(Ibeginscope inst) {
+		StackEntry top = this.newStackEntry();
+		top.pos = this.symbolTable.savePoint();
+		return inst.next;
+	}
+
+	public final DebugVMInstruction opIbeginlocalscope(Ibeginlocalscope inst) {
+		StackEntry top = this.newStackEntry();
+		top.pos = this.symbolTable.saveHiddenPoint(inst.tableName);
+		return inst.next;
+	}
+
+	public final DebugVMInstruction opIendscope(Iendscope inst) {
+		StackEntry top = this.popStack();
+		this.symbolTable.rollBack((int) top.pos);
+		return inst.next;
+	}
+
 }
 
 class ASTLog {
