@@ -14,6 +14,7 @@ public class LCndb extends Command {
 		// config.setNezOption(NezOption.DebugOption);
 		Command.displayVersion();
 		config.getNezOption().setOption("asis", true);
+		config.getNezOption().setOption("intern", false);
 		Grammar peg = config.getGrammar();
 		DebugInputManager manager = new DebugInputManager(config.inputFileLists);
 		manager.exec(peg);

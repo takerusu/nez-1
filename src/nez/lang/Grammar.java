@@ -168,14 +168,13 @@ public class Grammar {
 	public final boolean debug(DebugSourceContext s) {
 		boolean matched;
 		DebugVMInstruction pc;
-		this.option.setOption("intern", false);
 		long startPosition = s.getPosition();
 		DebugVMCompiler c = new DebugVMCompiler(this.option);
 		CommonTreeTransducer treeTransducer = new CommonTreeTransducer();
 		s.initContext();
 		pc = c.compile(this).getStartPoint();
-		NezDebugger debugger = new NezDebugger();
-		matched = debugger.exec(pc, s);
+		NezDebugger debugger = new NezDebugger(this, pc, s);
+		matched = debugger.exec();
 //		NezDebugger debugger = new NezDebugger(this, pc, s);
 //		matched = debugger.exec();
 //		if(matched) {
