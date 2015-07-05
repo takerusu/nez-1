@@ -1,5 +1,7 @@
 package nez.debugger;
 
+import java.util.Stack;
+
 import nez.NezOption;
 import nez.lang.And;
 import nez.lang.AnyChar;
@@ -220,31 +222,74 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeLink(Link p, Instruction next, Instruction failjump) {
-		p.get(0).encode(this, next, failjump);
+		if(this.option.enabledASTConstruction) {
+			BasicBlock fbb = new BasicBlock();
+			BasicBlock endbb = new BasicBlock();
+			this.builder.pushFailureJumpPoint(fbb);
+			this.builder.createImark(p);
+			p.get(0).encode(this, next, failjump);
+			this.builder.createIcommit(p);
+			this.builder.createIjump(p, endbb);
+			this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
+			this.builder.createIabort(p);
+			this.builder.createIjump(p, this.builder.jumpFailureJump());
+			this.builder.setInsertPoint(endbb);
+		} else {
+			p.get(0).encode(this, next, failjump);
+		}
 		return null;
 	}
 
+	Stack<Boolean> leftedStack = new Stack<Boolean>();
+
 	@Override
 	public Instruction encodeNew(New p, Instruction next) {
-		// TODO Auto-generated method stub
+		this.leftedStack.push(p.lefted);
+		if(this.option.enabledASTConstruction) {
+			if(p.lefted) {
+				BasicBlock fbb = new BasicBlock();
+				this.builder.pushFailureJumpPoint(fbb);
+				this.builder.createImark(p);
+				this.builder.createIleftnew(p);
+			} else {
+				this.builder.createInew(p);
+			}
+		}
 		return null;
 	}
 
 	@Override
 	public Instruction encodeCapture(Capture p, Instruction next) {
-		// TODO Auto-generated method stub
+		if(this.option.enabledASTConstruction) {
+			if(this.leftedStack.pop()) {
+				BasicBlock endbb = new BasicBlock();
+				this.builder.createIcapture(p);
+				this.builder.createIpop(p);
+				this.builder.createIjump(p, endbb);
+				this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
+				this.builder.createIabort(p);
+				this.builder.createIjump(p, this.builder.jumpFailureJump());
+				this.builder.setInsertPoint(endbb);
+			} else {
+				this.builder.createIcapture(p);
+			}
+		}
 		return null;
 	}
 
 	@Override
 	public Instruction encodeTagging(Tagging p, Instruction next) {
-		// TODO Auto-generated method stub
+		if(this.option.enabledASTConstruction) {
+			this.builder.createItag(p);
+		}
 		return null;
 	}
 
 	@Override
 	public Instruction encodeReplace(Replace p, Instruction next) {
-		// TODO Auto-generated method stub
+		if(this.option.enabledASTConstruction) {
+			this.builder.createIreplace(p);
+		}
 		return null;
 	}
 

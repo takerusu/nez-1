@@ -15,12 +15,14 @@ public abstract class Context implements Source {
 
 	public final void initContext() {
 		this.result = true;
+		this.lastAppendedLog = new ASTLog();
 		this.stack = new StackEntry[StackSize];
 		for(int i = 0; i < this.stack.length; i++) {
 			this.stack[i] = new StackEntry();
 		}
 		this.stack[0].jump = new Iexit(null);
 		this.stack[0].failjump = new Iexit(null);
+		this.stack[0].mark = this.lastAppendedLog;
 		this.StackTop = 0;
 		this.treeTransducer = new CommonTreeTransducer();
 	}
@@ -171,6 +173,10 @@ public abstract class Context implements Source {
 	private ASTLog lastAppendedLog = null;
 	private ASTLog unusedDataLog = null;
 
+	public Object getLeftObject() {
+		return this.left;
+	}
+
 	private final void pushDataLog(int type, long pos, Object value) {
 		ASTLog l;
 		if(this.unusedDataLog == null) {
@@ -252,6 +258,17 @@ public abstract class Context implements Source {
 		this.unusedDataLog.prev = null;
 		this.lastAppendedLog = checkPoint;
 		this.lastAppendedLog.next = null;
+	}
+
+	public final Object newTopLevelNode() {
+		for(ASTLog cur = this.lastAppendedLog; cur != null; cur = cur.prev) {
+			if(cur.type == ASTLog.LazyNew) {
+				this.left = logCommit(cur);
+				logAbort(cur.prev, false);
+				return this.left;
+			}
+		}
+		return null;
 	}
 
 	public final DebugVMInstruction opInew(Inew inst) {

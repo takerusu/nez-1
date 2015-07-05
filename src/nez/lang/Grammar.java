@@ -7,6 +7,7 @@ import nez.NezOption;
 import nez.SourceContext;
 import nez.ast.CommonTree;
 import nez.ast.CommonTreeTransducer;
+import nez.ast.CommonTreeWriter;
 import nez.ast.TreeTransducer;
 import nez.debugger.DebugInputManager;
 import nez.debugger.DebugSourceContext;
@@ -168,7 +169,9 @@ public class Grammar {
 		boolean matched;
 		DebugVMInstruction pc;
 		this.option.setOption("intern", false);
+		long startPosition = s.getPosition();
 		DebugVMCompiler c = new DebugVMCompiler(this.option);
+		CommonTreeTransducer treeTransducer = new CommonTreeTransducer();
 		s.initContext();
 		pc = c.compile(this).getStartPoint();
 		NezDebugger debugger = new NezDebugger();
@@ -180,6 +183,13 @@ public class Grammar {
 //		}
 		if(matched) {
 			ConsoleUtils.println("match!!");
+			s.newTopLevelNode();
+			Object node = s.getLeftObject();
+			if(node == null) {
+				node = treeTransducer.newNode(null, s, startPosition, s.getPosition(), 0, null);
+			}
+			CommonTree tree = (CommonTree)treeTransducer.commit(node);
+			new CommonTreeWriter().transform(null, tree);
 		}
 		else {
 			ConsoleUtils.println("unmatch!!");
