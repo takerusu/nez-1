@@ -28,6 +28,5 @@ public enum Opcode {
 	Iexists,
 	Ibeginscope,
 	Ibeginlocalscope,
-	Iendscope,
-	Iendscopefail
+	Iendscope
 }

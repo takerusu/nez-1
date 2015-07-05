@@ -232,16 +232,16 @@ public class IRBuilder {
 		return this.curBB.append(new Idef(e));
 	}
 
-	public DebugVMInstruction createIis(IsSymbol e) {
-		return this.curBB.append(new Iis(e));
+	public DebugVMInstruction createIis(IsSymbol e, BasicBlock jump) {
+		return this.curBB.append(new Iis(e, jump));
 	}
 
-	public DebugVMInstruction createIisa(IsSymbol e) {
-		return this.curBB.append(new Iisa(e));
+	public DebugVMInstruction createIisa(IsSymbol e, BasicBlock jump) {
+		return this.curBB.append(new Iisa(e, jump));
 	}
 
-	public DebugVMInstruction createIexists(ExistsSymbol e) {
-		return this.curBB.append(new Iexists(e));
+	public DebugVMInstruction createIexists(ExistsSymbol e, BasicBlock jump) {
+		return this.curBB.append(new Iexists(e, jump));
 	}
 
 	public DebugVMInstruction createIbeginscope(Expression e) {
@@ -254,9 +254,5 @@ public class IRBuilder {
 
 	public DebugVMInstruction createIendscope(Expression e) {
 		return this.curBB.append(new Iendscope(e));
-	}
-
-	public DebugVMInstruction createIendscopefail(Expression e) {
-		return this.curBB.append(new Iendscopefail(e));
 	}
 }

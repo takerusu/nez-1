@@ -573,23 +573,23 @@ class Idef extends DebugVMInstruction {
 	}
 }
 
-class Iis extends DebugVMInstruction {
+class Iis extends JumpInstruction {
 	Tag tableName;
 
-	public Iis(IsSymbol e) {
-		super(e);
+	public Iis(IsSymbol e, BasicBlock jumpBB) {
+		super(e, jumpBB);
 		this.op = Opcode.Iis;
 		this.tableName = e.tableName;
 	}
 
 	@Override
 	public void stringfy(StringBuilder sb) {
-		sb.append("Iis ").append(this.tableName.getName());
+		sb.append("Iis ").append(this.tableName.getName()).append(" ").append(this.jumpBB.getName());
 	}
 
 	@Override
 	public String toString() {
-		return "Iis " + this.tableName.getName();
+		return "Iis " + this.tableName.getName() + " (" + this.jumpBB.codePoint + ")";
 	}
 
 	@Override
@@ -598,23 +598,23 @@ class Iis extends DebugVMInstruction {
 	}
 }
 
-class Iisa extends DebugVMInstruction {
+class Iisa extends JumpInstruction {
 	Tag tableName;
 
-	public Iisa(IsSymbol e) {
-		super(e);
+	public Iisa(IsSymbol e, BasicBlock jumpBB) {
+		super(e, jumpBB);
 		this.op = Opcode.Iisa;
 		this.tableName = e.tableName;
 	}
 
 	@Override
 	public void stringfy(StringBuilder sb) {
-		sb.append("Iisa ").append(this.tableName.getName());
+		sb.append("Iisa ").append(this.tableName.getName()).append(" ").append(this.jumpBB.getName());
 	}
 
 	@Override
 	public String toString() {
-		return "Iisa " + this.tableName.getName();
+		return "Iisa " + this.tableName.getName() + " (" + this.jumpBB.codePoint + ")";
 	}
 
 	@Override
@@ -623,11 +623,11 @@ class Iisa extends DebugVMInstruction {
 	}
 }
 
-class Iexists extends DebugVMInstruction {
+class Iexists extends JumpInstruction {
 	Tag tableName;
 
-	public Iexists(ExistsSymbol e) {
-		super(e);
+	public Iexists(ExistsSymbol e, BasicBlock jumpBB) {
+		super(e, jumpBB);
 		this.op = Opcode.Iexists;
 		this.tableName = e.tableName;
 	}
@@ -714,27 +714,5 @@ class Iendscope extends DebugVMInstruction {
 	@Override
 	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
 		return ctx.opIendscope(this);
-	}
-}
-
-class Iendscopefail extends DebugVMInstruction {
-	public Iendscopefail(Expression e) {
-		super(e);
-		this.op = Opcode.Iendscopefail;
-	}
-
-	@Override
-	public void stringfy(StringBuilder sb) {
-		sb.append("Iendscopefail");
-	}
-
-	@Override
-	public String toString() {
-		return "Iendscopefail";
-	}
-
-	@Override
-	public DebugVMInstruction exec(Context ctx) throws MachineExitException {
-		return ctx.opIendscopefail(this);
 	}
 }
