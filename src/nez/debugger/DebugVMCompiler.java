@@ -295,19 +295,47 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeBlock(Block p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		BasicBlock fbb = new BasicBlock();
+		BasicBlock endbb = new BasicBlock();
+		this.builder.pushFailureJumpPoint(fbb);
+		this.builder.createIbeginscope(p);
+		p.get(0).encode(this, next, failjump);
+		this.builder.createIendscope(p);
+		this.builder.createIjump(p, endbb);
+		this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
+		this.builder.createIendscope(p);
+		this.builder.createIjump(p, this.builder.jumpFailureJump());
+		this.builder.setInsertPoint(endbb);
 		return null;
 	}
 
 	@Override
 	public Instruction encodeDefSymbol(DefSymbol p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		BasicBlock fbb = new BasicBlock();
+		BasicBlock endbb = new BasicBlock();
+		this.builder.pushFailureJumpPoint(fbb);
+		this.builder.createIpush(p);
+		p.get(0).encode(this, next, failjump);
+		this.builder.createIdef(p);
+		this.builder.createIjump(p, endbb);
+		this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
+		this.builder.createIpop(p);
+		this.builder.createIjump(p, this.builder.jumpFailureJump());
+		this.builder.setInsertPoint(endbb);
 		return null;
 	}
 
 	@Override
 	public Instruction encodeIsSymbol(IsSymbol p, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		if(p.checkLastSymbolOnly) {
+			this.builder.createIis(p, this.builder.jumpFailureJump());
+			this.builder.setInsertPoint(new BasicBlock());
+		} else {
+			this.builder.createIpush(p);
+			p.getSymbolExpression().encode(this, next, failjump);
+			this.builder.createIisa(p, this.builder.jumpFailureJump());
+			this.builder.setInsertPoint(new BasicBlock());
+		}
 		return null;
 	}
 
@@ -325,13 +353,24 @@ public class DebugVMCompiler extends NezEncoder {
 
 	@Override
 	public Instruction encodeExistsSymbol(ExistsSymbol existsSymbol, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		this.builder.createIexists(existsSymbol, this.builder.jumpFailureJump());
+		this.builder.setInsertPoint(new BasicBlock());
 		return null;
 	}
 
 	@Override
 	public Instruction encodeLocalTable(LocalTable localTable, Instruction next, Instruction failjump) {
-		// TODO Auto-generated method stub
+		BasicBlock fbb = new BasicBlock();
+		BasicBlock endbb = new BasicBlock();
+		this.builder.pushFailureJumpPoint(fbb);
+		this.builder.createIbeginlocalscope(localTable);
+		localTable.get(0).encode(this, next, failjump);
+		this.builder.createIendscope(localTable);
+		this.builder.createIjump(localTable, endbb);
+		this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
+		this.builder.createIendscope(localTable);
+		this.builder.createIjump(localTable, this.builder.jumpFailureJump());
+		this.builder.setInsertPoint(endbb);
 		return null;
 	}
 
