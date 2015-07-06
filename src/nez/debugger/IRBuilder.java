@@ -58,7 +58,7 @@ public class IRBuilder {
 				}
 			}
 		}
-		this.dumpLastestCode();
+		// this.dumpLastestCode();
 		return this.module;
 	}
 

@@ -30,7 +30,6 @@ import nez.lang.Repetition1;
 import nez.lang.Replace;
 import nez.lang.Sequence;
 import nez.lang.Tagging;
-import nez.util.ConsoleUtils;
 import nez.vm.Instruction;
 import nez.vm.NezEncoder;
 
@@ -47,7 +46,8 @@ public class DebugVMCompiler extends NezEncoder {
 		for(Production p : grammar.getProductionList()) {
 			this.encodeProduction(p);
 		}
-		ConsoleUtils.println(this.builder.getModule().stringfy(new StringBuilder()));
+		// ConsoleUtils.println(this.builder.getModule().stringfy(new
+		// StringBuilder()));
 		return this.builder.buildInstructionSequence();
 	}
 

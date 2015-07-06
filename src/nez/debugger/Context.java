@@ -137,6 +137,7 @@ public abstract class Context implements Source {
 	public final DebugVMInstruction opIpush(Ipush inst) {
 		StackEntry top = this.newStackEntry();
 		top.pos = this.pos;
+		top.mark = this.lastAppendedLog;
 		return inst.next;
 	}
 
@@ -146,7 +147,11 @@ public abstract class Context implements Source {
 	}
 
 	public final DebugVMInstruction opIpeek(Ipeek inst) {
-		this.pos = this.peekStack().pos;
+		StackEntry top = this.peekStack();
+		this.pos = top.pos;
+		if(top.mark != this.lastAppendedLog) {
+			this.logAbort(top.mark, true);
+		}
 		return inst.next;
 	}
 
@@ -268,15 +273,18 @@ public abstract class Context implements Source {
 		if(objectSize > 0) {
 			for(ASTLog cur = start.next; cur != end; cur = cur.next) {
 				if(cur.type == ASTLog.LazyLink) {
+					// System.out.println("Link >> " + cur);
 					this.treeTransducer.link(newnode, (int) cur.pos, cur.value);
 				}
 			}
 		}
+		// System.out.println("Commit >> " + newnode);
 		return this.treeTransducer.commit(newnode);
 	}
 
 	public final void logAbort(ASTLog checkPoint, boolean isFail) {
 		assert(checkPoint != null);
+		// System.out.println("Abort >> " + checkPoint);
 		this.lastAppendedLog.next = this.unusedDataLog;
 		this.unusedDataLog = checkPoint.next;
 		this.unusedDataLog.prev = null;
@@ -340,7 +348,10 @@ public abstract class Context implements Source {
 	}
 
 	public final DebugVMInstruction opIabort(Iabort inst) {
-		this.logAbort(this.popStack().mark, true);
+		StackEntry top = this.popStack();
+		if(top.mark != this.lastAppendedLog) {
+			this.logAbort(top.mark, true);
+		}
 		return inst.next;
 	}
 
