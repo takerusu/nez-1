@@ -11,7 +11,9 @@ public abstract class Context implements Source {
 	long longest_pos;
 	boolean result;
 	StackEntry[] stack = null;
+	StackEntry[] callStack = null;
 	int StackTop;
+	int callStackTop;
 	private static int StackSize = 128;
 
 	public final void initContext() {
@@ -19,13 +21,16 @@ public abstract class Context implements Source {
 		this.lastAppendedLog = new ASTLog();
 		this.symbolTable = new SymbolTable();
 		this.stack = new StackEntry[StackSize];
+		this.callStack = new StackEntry[StackSize];
 		for(int i = 0; i < this.stack.length; i++) {
 			this.stack[i] = new StackEntry();
+			this.callStack[i] = new StackEntry();
 		}
-		this.stack[0].jump = new Iexit(null);
-		this.stack[0].failjump = new Iexit(null);
+		this.callStack[0].jump = new Iexit(null);
+		this.callStack[0].failjump = new Iexit(null);
 		this.stack[0].mark = this.lastAppendedLog;
 		this.StackTop = 0;
+		this.callStackTop = 0;
 		this.treeTransducer = new CommonTreeTransducer();
 	}
 
@@ -66,8 +71,25 @@ public abstract class Context implements Source {
 		return this.stack[this.StackTop];
 	}
 
+	public final StackEntry newCallStackEntry() {
+		this.callStackTop++;
+		if(this.callStackTop == this.callStack.length) {
+			StackEntry[] newStack = new StackEntry[this.callStack.length * 2];
+			System.arraycopy(this.callStack, 0, newStack, 0, callStack.length);
+			for(int i = this.callStack.length; i < newStack.length; i++) {
+				newStack[i] = new StackEntry();
+			}
+			this.callStack = newStack;
+		}
+		return this.callStack[this.callStackTop];
+	}
+
 	public final StackEntry popStack() {
 		return this.stack[this.StackTop--];
+	}
+
+	public final StackEntry popCallStack() {
+		return this.callStack[this.callStackTop--];
 	}
 
 	public final StackEntry peekStack() {
@@ -87,14 +109,14 @@ public abstract class Context implements Source {
 	}
 
 	public final DebugVMInstruction opIcall(Icall inst) {
-		StackEntry top = this.newStackEntry();
+		StackEntry top = this.newCallStackEntry();
 		top.jump = inst.jump;
 		top.failjump = inst.failjump;
 		return inst.next;
 	}
 
 	public final DebugVMInstruction opIret(Iret inst) {
-		StackEntry top = this.popStack();
+		StackEntry top = this.popCallStack();
 		if(this.result) {
 			return top.jump;
 		}
