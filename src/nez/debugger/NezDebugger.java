@@ -95,11 +95,7 @@ public class NezDebugger {
 			e = code.getExpression();
 		}
 		if(running && e != null) {
-			if(e.getSourcePosition() == null) {
-				ConsoleUtils.println(e.toString());
-			} else {
-				ConsoleUtils.println(e.getSourcePosition().formatSourceMessage("debug", ""));
-			}
+			ConsoleUtils.println(e.getSourcePosition().formatSourceMessage("debug", ""));
 		} else if(e == null) {
 			ConsoleUtils.println("e = null");
 		}
@@ -280,8 +276,8 @@ public class NezDebugger {
 
 	public boolean exec(StepOver o) throws MachineExitException {
 		if(this.code.op.equals(Opcode.Icall)) {
-			int stackTop = this.sc.StackTop;
-			while(stackTop <= this.sc.StackTop) {
+			int stackTop = this.sc.callStackTop;
+			while(stackTop <= this.sc.callStackTop) {
 				if(!this.execCode()) {
 					break;
 				}
@@ -302,16 +298,34 @@ public class NezDebugger {
 	}
 
 	public boolean exec(StepIn o) throws MachineExitException {
-
+		Expression e = this.code.getExpression();
+		Expression current = this.code.getExpression();
+		while(e.equals(current)) {
+			this.code = this.code.exec(this.sc);
+			current = this.code.getExpression();
+		}
+		if(this.code.op.equals(Opcode.Iret)) {
+			this.code = this.code.exec(this.sc);
+		}
 		return true;
 	}
 
 	public boolean exec(StepOut o) throws MachineExitException {
-
+		int stackTop = this.sc.callStackTop;
+		while(stackTop <= this.sc.callStackTop) {
+			if(!this.execCode()) {
+				break;
+			}
+		}
 		return true;
 	}
 
 	public boolean exec(Continue o) throws MachineExitException {
+		while(true) {
+			if(!this.execCode()) {
+				break;
+			}
+		}
 		return true;
 	}
 
