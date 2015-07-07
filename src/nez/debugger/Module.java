@@ -3,18 +3,24 @@ package nez.debugger;
 import java.util.ArrayList;
 import java.util.List;
 
+import nez.lang.Grammar;
 import nez.util.ConsoleUtils;
 
 public class Module {
 	List<Function> funcList;
+	Grammar g;
 
 	public Module() {
 		this.funcList = new ArrayList<Function>();
 	}
 
+	public void setGrammar(Grammar g) {
+		this.g = g;
+	}
+
 	public DebugVMInstruction getStartPoint() {
 		for(Function func : this.funcList) {
-			if(func.funcName.equals("File")) {
+			if(func.funcName.equals(this.g.getStartProduction().getLocalName())) {
 				return func.getStartInstruction();
 			}
 		}

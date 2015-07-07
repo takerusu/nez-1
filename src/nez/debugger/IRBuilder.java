@@ -6,6 +6,7 @@ import nez.lang.ByteMap;
 import nez.lang.DefSymbol;
 import nez.lang.ExistsSymbol;
 import nez.lang.Expression;
+import nez.lang.Grammar;
 import nez.lang.IsSymbol;
 import nez.lang.Link;
 import nez.lang.LocalTable;
@@ -79,6 +80,10 @@ public class IRBuilder {
 
 	public Module getModule() {
 		return this.module;
+	}
+
+	public void setGrammar(Grammar g) {
+		this.module.setGrammar(g);
 	}
 
 	public Function getFunction() {

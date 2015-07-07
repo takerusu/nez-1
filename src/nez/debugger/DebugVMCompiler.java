@@ -43,6 +43,7 @@ public class DebugVMCompiler extends NezEncoder {
 	}
 
 	public Module compile(Grammar grammar) {
+		this.builder.setGrammar(grammar);
 		for(Production p : grammar.getProductionList()) {
 			this.encodeProduction(p);
 		}
@@ -192,23 +193,23 @@ public class DebugVMCompiler extends NezEncoder {
 	public Instruction encodeChoice(Choice p, Instruction next, Instruction failjump) {
 		BasicBlock fbb = null;
 		BasicBlock mergebb = new BasicBlock();
-		this.builder.createIpush(p);
+		this.builder.createIpush(p.get(0));
 		for(int i = 0; i < p.size(); i++) {
 			fbb = new BasicBlock();
 			this.builder.pushFailureJumpPoint(fbb);
 			p.get(i).encode(this, next, failjump);
-			this.builder.createIjump(p, mergebb);
+			this.builder.createIjump(p.get(i), mergebb);
 			this.builder.setInsertPoint(this.builder.popFailureJumpPoint());
 			if(i != p.size() - 1) {
-				this.builder.createIsucc(p);
-				this.builder.createIpeek(p);
+				this.builder.createIsucc(p.get(i));
+				this.builder.createIpeek(p.get(i));
 			} else {
-				this.builder.createIpop(p);
+				this.builder.createIpop(p.get(i));
 			}
 		}
-		this.builder.createIjump(p, this.builder.jumpFailureJump());
+		this.builder.createIjump(p.get(p.size() - 1), this.builder.jumpFailureJump());
 		this.builder.setInsertPoint(mergebb);
-		this.builder.createIpop(p);
+		this.builder.createIpop(p.get(p.size() - 1));
 		return null;
 	}
 
