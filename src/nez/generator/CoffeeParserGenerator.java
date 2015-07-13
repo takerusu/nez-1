@@ -2,6 +2,8 @@ package nez.generator;
 
 import jdk.nashorn.internal.runtime.regexp.RegExp;
 
+import com.sun.org.apache.bcel.internal.generic.POP;
+import com.sun.org.apache.bcel.internal.generic.PUSH;
 import com.sun.org.apache.xpath.internal.functions.FunctionDef1Arg;
 
 import nez.NezOption;
@@ -147,6 +149,7 @@ public class CoffeeParserGenerator extends ParserGenerator {
 		}
 		Close();
 		Let(_pos() ,"pos" + p.getId());
+		backtrackObj();
 		Let("result", "true");
 	}
 
@@ -164,6 +167,7 @@ public class CoffeeParserGenerator extends ParserGenerator {
 		}
 		Close();
 		Let(_pos() ,"pos" + p.getId());
+		backtrackObj();
 		Let("result", "true");
 		Close();
 
@@ -175,12 +179,12 @@ public class CoffeeParserGenerator extends ParserGenerator {
 		Let("pos" + p.getId(), _pos());
 		Let("outs" + p.getId(), _outobj());
 		visitExpression(p.get(0));
-		If(StEq(_result(), "false")).Open();
 		Let(_pos(), "pos" + p.getId());
+		backtrackObj();
+		If(StEq(_result(), "false")).Open();
 		Let(_result(), "false");
 		Close();
 		Else().Open();
-		Let(_pos(), "pos" + p.getId());
 		Let(_result(), "true");
 		Close();
 	}
@@ -189,12 +193,12 @@ public class CoffeeParserGenerator extends ParserGenerator {
 	public void visitNot(Not p) {
 		Let("pos" + p.getId(), _pos());
 		visitExpression(p.get(0));
-		If(StEq(_result(), "false")).Open();
 		Let(_pos(), "pos" + p.getId());
+		backtrackObj();
+		If(StEq(_result(), "false")).Open();
 		Let(_result(), "true");
 		Close();
 		Else().Open();
-		Let(_pos(), "pos" + p.getId());
 		Let(_result(), "false");
 		Close();
 	}
@@ -234,6 +238,7 @@ public class CoffeeParserGenerator extends ParserGenerator {
 			if(!isFirst) {
 				If(StEq("result", "false")).Open();
 				Let(_pos(), "pos" + p.getId());
+				backtrackObj();
 				Let(_result(), _true());
 				visitExpression(e);
 			} else {
@@ -251,6 +256,7 @@ public class CoffeeParserGenerator extends ParserGenerator {
 	@Override
 	public void visitNonTerminal(NonTerminal p) {
 		Let("result", callFunc("@nez$" + p.getLocalName()));
+		//Print("result");
 	}
 
 	@Override
@@ -261,27 +267,29 @@ public class CoffeeParserGenerator extends ParserGenerator {
 
 	@Override
 	public void visitLink(Link p) {
-		 visitExpression(p.get(0));
-		 L(_outobj()).W(".").W(callFunc("push", _result()));
+		visitExpression(p.get(0));
+		L(_outobj() + ".push " + _result() + " if " + StNotEq("typeof " + _result(), "\"boolean\""));
 	}
 
 	@Override
 	public void visitNew(New p) {
-		Print("new: " + _pos() + ", " + _currentchar());
+		if(p.lefted) {
+			L(_outobj() + ".push " + _result() + " if " + StNotEq("typeof " + _result(), "\"boolean\""));
+		}
+		Push();
 		makePosObj();
 	}
 
 	@Override
 	public void visitCapture(Capture p) {
-		Print("capture: " + _pos() + ", " + _currentchar());
 		setEndPos();
 		makeObject();
+		Pop();
 	}
 
 	@Override
 	public void visitTagging(Tagging p) {
-		Print("tagging: " + _pos() + ", " + _currentchar());
-		Let(_tag(), "\"" + p.getTagName() + "\"");
+		Let(_tag(), "\"" + p.getTagName() + "\" if "+ StNotEq(_result(), _false()));
 	}
 
 	@Override
@@ -354,6 +362,17 @@ public class CoffeeParserGenerator extends ParserGenerator {
 	
 	protected void makeObject() {
 		Let(_obj(), "{}");
+		Let(_result(), _true());
+		If(StEq(_tag(), "\"\"")).Open();
+		If(MoreThan(_outobj() + ".length", "0")).Open();
+		Let(_obj(), _outobj() + ".pop()");
+		Close();
+		ElseIf("@obj?").Open();
+		Let(_obj(), "@obj");
+		Close();
+		Close();
+		
+		Else().Open();
 		Let("obj.tag", _tag());
 		Let("obj.pos", "posobj").W(" if posobj?");
 		If(StNotEq(_outobj() + ".length", "0")).Open();
@@ -361,12 +380,19 @@ public class CoffeeParserGenerator extends ParserGenerator {
 		Let("@obj", _obj());
 		Close();
 		ElseIf("posobj?").Open();
+		Let("posobj.end", _pos() + " if !posobj.end?");
 		Let("obj.value", _slice());
 		Let("@obj", _obj());
 		Close();
 		Else().Open();
-		Let(_obj(), "@obj");
+		Let(_obj(), "@obj if @obj?");
 		Close();
+		Close();
+		Let("posobj", "null");
+		If("!obj.value?" + " or " + StEq("obj.value", "\"\"")).Open();
+		Let("obj", "true");
+		Close();
+		Let(_outobj(), "[" + _obj() + "]").W("if obj isnt true");
 	}
 	
 	protected CoffeeParserGenerator L(String line) {
@@ -576,17 +602,34 @@ public class CoffeeParserGenerator extends ParserGenerator {
 	}
 	
 	protected void setEndPos() {
-		Let("posobj.end", _pos());
+		Let("posobj.end", _pos() + " if posobj?");
+	}
+	
+	protected void Push() {
+		L("@poss.push(posobj) if posobj?");
+	}
+	
+	protected void Pop() {
+		Let("posobj", "@poss.pop(posobj) if @poss.length > 0");
 	}
 	
 	protected void backtrackObj() {
-		While(MoreThan("poss.length", "0") + " and " + MoreThanEq("poss[poss.length-1]", _pos()));
-		Open();
-		L("poss.pop()");
+		If("posobj?").Open();
+		If("posobj.end? and " + MoreThanEq("posobj.end", _pos())).Open();
+		Let("posobj.end", "null");
 		Close();
-		While(MoreThan("tags.length", "0") + " and " + MoreThanEq("tags[tags.length-1]", _pos()));
+		If("posobj.start? and " + MoreThanEq("posobj.start", _pos())).Open();
+		Let("posobj", "null");
+		Close();
+		Close();
+	
+		While(MoreThan("@poss.length", "0") + " and " + MoreThan("@poss[@poss.length-1]", _pos()));
 		Open();
-		L("tags.pop()");
+		L("@poss.pop()");
+		Close();
+		While(MoreThan("@tags.length", "0") + " and " + MoreThan("@tags[@tags.length-1]", _pos()));
+		Open();
+		L("@tags.pop()");
 		Close();
 	}
 	
