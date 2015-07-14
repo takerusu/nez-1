@@ -573,7 +573,7 @@ public class CoffeeParserGenerator extends ParserGenerator {
 	
 	protected String _regex(int ch) {
 		String pattern = intToStr(ch);
-		return "/" + pattern + "/";
+		return "/[" + pattern + "]/";
  	}
 	
 	protected String intToStr(int ch) {
