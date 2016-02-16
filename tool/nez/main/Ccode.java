@@ -6,6 +6,7 @@ import nez.lang.Grammar;
 import nez.parser.Parser;
 import nez.tool.parser.CParserGenerator;
 import nez.tool.parser.CoffeeParserGenerator;
+import nez.tool.parser.GoParserGenerator;
 import nez.tool.parser.JavaParserGenerator;
 import nez.tool.parser.PythonParserGenerator;
 import nez.tool.parser.SourceGenerator;
@@ -36,6 +37,8 @@ public class Ccode extends Command {
 			return new PythonParserGenerator();
 		case "coffee":
 			return new CoffeeParserGenerator();
+		case "go":
+			return new GoParserGenerator();
 		default:
 			return (SourceGenerator) this.newExtendedOutputHandler("", "c java python coffee");
 		}
